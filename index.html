@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR/Barcode Scanner</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center; /* Center the headline */
+        }
+        .license-plate {
+            display: block;
+            margin-bottom: 10px;
+            width: 80%;  
+            padding: 10px;
+            font-size: 24px;
+            text-align: center;
+            background-color: #f5dd07;
+            border: 2px solid #000;
+            border-radius: 5px;
+            letter-spacing: 2px;
+            color: #000;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .video-container {
+            display: none;
+            width: 100%;
+            max-width: 150px; 
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .output {
+            margin-top: 10px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-size: 14px; 
+            text-align: left; /* Align text to the left */
+            margin-left: auto;
+            margin-right: auto;
+            width: 80%;
+        }
+        input, button {
+            display: block;
+            margin-bottom: 10px;
+            width: 100%;  
+            padding: 10px;
+            font-size: 16px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .camera-icon {
+            font-size: 20px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+        }
+        .scanner-container {
+            margin-bottom: 10px;
+            width: 80%;  
+            margin-left: auto;
+            margin-right: auto;
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Scan QR/Barcode</h1>
+    
+    <!-- Input for vehicle number styled as a license plate -->
+    <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter vehicle number">
+
+    <!-- Scanners -->
+    <div class="scanner-container">
+        <div class="camera-icon" id="start-camera-1">&#x1F4F7; Start Camera 1</div>
+        <video id="video-1" class="video-container" autoplay></video>
+        <div class="output">Scanned Code 1: <span id="scanned-result-1"></span></div>
+    </div>
+    <div class="scanner-container">
+        <div class="camera-icon" id="start-camera-2">&#x1F4F7; Start Camera 2</div>
+        <video id="video-2" class="video-container" autoplay></video>
+        <div class="output">Scanned Code 2: <span id="scanned-result-2"></span></div>
+    </div>
+    <div class="scanner-container">
+        <div class="camera-icon" id="start-camera-3">&#x1F4F7; Start Camera 3</div>
+        <video id="video-3" class="video-container" autoplay></video>
+        <div class="output">Scanned Code 3: <span id="scanned-result-3"></span></div>
+    </div>
+    <div class="scanner-container">
+        <div class="camera-icon" id="start-camera-4">&#x1F4F7; Start Camera 4</div>
+        <video id="video-4" class="video-container" autoplay></video>
+        <div class="output">Scanned Code 4: <span id="scanned-result-4"></span></div>
+    </div>
+    <div class="scanner-container">
+        <div class="camera-icon" id="start-camera-5">&#x1F4F7; Start Camera 5</div>
+        <video id="video-5" class="video-container" autoplay></video>
+        <div class="output">Scanned Code 5: <span id="scanned-result-5"></span></div>
+    </div>
+    <div class="scanner-container">
+        <div class="camera-icon" id="start-camera-6">&#x1F4F7; Start Camera 6</div>
+        <video id="video-6" class="video-container" autoplay></video>
+        <div class="output">Scanned Code 6: <span id="scanned-result-6"></span></div>
+    </div>
+    
+    <!-- Submit button -->
+    <button id="submit">Submit</button>
+
+    <!-- Footer message -->
+    <footer>This website was developed by Yarin Waizman</footer>
+    
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <script>
+        // Reference to elements
+        const videoElements = [
+            document.getElementById('video-1'),
+            document.getElementById('video-2'),
+            document.getElementById('video-3'),
+            document.getElementById('video-4'),
+            document.getElementById('video-5'),
+            document.getElementById('video-6')
+        ];
+
+        const scannedResultElements = [
+            document.getElementById('scanned-result-1'),
+            document.getElementById('scanned-result-2'),
+            document.getElementById('scanned-result-3'),
+            document.getElementById('scanned-result-4'),
+            document.getElementById('scanned-result-5'),
+            document.getElementById('scanned-result-6')
+        ];
+
+        const startCameraButtons = [
+            document.getElementById('start-camera-1'),
+            document.getElementById('start-camera-2'),
+            document.getElementById('start-camera-3'),
+            document.getElementById('start-camera-4'),
+            document.getElementById('start-camera-5'),
+            document.getElementById('start-camera-6')
+        ];
+
+        const submitButton = document.getElementById('submit');
+        const vehicleNumberInput = document.getElementById('vehicle-number');
+
+        // Create instance of the ZXing BarcodeReader
+        const codeReader = new ZXing.BrowserMultiFormatReader();
+        
+        const scannedCodes = Array(6).fill('');
+
+        // Function to start the camera
+        function startCamera(index) {
+            videoElements[index].style.display = 'block';
+            startCameraButtons[index].style.display = 'none';
+            codeReader
+                .listVideoInputDevices()
+                .then(videoInputDevices => {
+                    const firstDeviceId = videoInputDevices[0].deviceId;
+                    codeReader.decodeFromVideoDevice(firstDeviceId, videoElements[index].id, (result, err) => {
+                        if (result) {
+                            scannedResultElements[index].textContent = result.text;
+                            scannedCodes[index] = result.text;
+                            videoElements[index].style.display = 'none'; // Hide camera after scanning
+                            console.log(`Scanned result ${index + 1}:`, result.text);
+                        }
+                        if (err && !(err instanceof ZXing.NotFoundException)) {
+                            console.error(err);
+                        }
+                    });
+                })
+                .catch(err => console.error(err));
+        }
+
+        // Event listeners for the camera icons
+        startCameraButtons.forEach((button, index) => {
+            button.addEventListener('click', () => startCamera(index));
+        });
+
+        // Event listener for the submit button
+        submitButton.addEventListener('click', () => {
+            const vehicleNumber = vehicleNumberInput.value;
+            if (scannedCodes.length > 0 && vehicleNumber) {
+                // Send scanned codes and vehicle number to the backend
+                console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
+                fetch('http://localhost:5000/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
+                })
+                .then(response => response.json())
+                .then(data => console.log('Success:', data))
+                .catch(error => console.error('Error:', error));
+            } else {
+                console.log("No scanned codes or vehicle number to submit.");
+            }
+        });
+    </script>
+</body>
+</html>

@@ -14,11 +14,13 @@ print(f"Using Excel file path: {EXCEL_FILE_PATH}")
 # Load the existing Excel file or create a new one
 def load_excel():
     try:
+        print(f"Loading from {EXCEL_FILE_PATH}")
         df = pd.read_excel(EXCEL_FILE_PATH)
         # Reorder columns if they exist
         df = df[['VehicleNumber', 'ScannedCode', 'Timestamp']]
         return df
     except FileNotFoundError:
+        print("Excel file not found. Creating a new one.")
         return pd.DataFrame(columns=['VehicleNumber', 'ScannedCode', 'Timestamp'])
 
 # Save the DataFrame back to the Excel file
@@ -40,6 +42,7 @@ def submit_data():
     scanned_codes = data.get('codes')
 
     if not vehicle_number or not scanned_codes:
+        print("Invalid input data")
         return jsonify({'error': 'Invalid input data'}), 400
 
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

@@ -5,13 +5,14 @@ Quagga.onDetected(function(result) {
     document.getElementById('scanned-result').textContent = scannedCode;
     
     // Send the scanned code to the backend for storage
-    fetch('https://qrscanner-6dow.onrender.com/submit', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ code: scannedCode })
-    })
+   fetch('https://qrscanner-6dow.onrender.com/submit', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
+})
+
     .then(response => response.json())
     .then(data => {
         console.log('Success:', data);

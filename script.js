@@ -25,24 +25,19 @@ Quagga.onDetected(function(result) {
 function startCamera(index) {
     videoElements[index].style.display = 'block';
     startCameraButtons[index].style.display = 'none';
-    codeReader
-        .listVideoInputDevices()
-        .then(videoInputDevices => {
-            const rearCamera = videoInputDevices.find(device => device.label.toLowerCase().includes('back')) || videoInputDevices[0];
-            codeReader.decodeFromVideoDevice(rearCamera.deviceId, videoElements[index].id, (result, err) => {
-                if (result) {
-                    scannedResultElements[index].textContent = result.text;
-                    scannedCodes[index] = result.text;
-                    videoElements[index].style.display = 'none'; // Hide camera after scanning
-                    console.log(`Scanned result ${index + 1}:`, result.text);
-                }
-                if (err && !(err instanceof ZXing.NotFoundException)) {
-                    console.error(err);
-                }
-            });
+    const constraints = {
+        video: {
+            facingMode: 'environment' // Rear camera
+        }
+    };
+    navigator.mediaDevices.getUserMedia(constraints)
+        .then(stream => {
+            videoElements[index].srcObject = stream;
+            videoElements[index].play();
         })
-        .catch(err => console.error(err));
+        .catch(err => console.error('Error accessing camera:', err));
 }
+
 
 
 const videoElements = [

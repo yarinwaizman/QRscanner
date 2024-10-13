@@ -5,106 +5,202 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR/Barcode Scanner</title>
     <style>
-        /* Basic styling */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
             text-align: center;
-            margin: 20px;
+            padding: 20px;
         }
-
-        .qr-reader {
-            width: 320px; /* Set desired width */
-            height: 240px; /* Set desired height */
-            display: none; /* Initially hidden */
-            margin: 0 auto; /* Center the video */
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 20px;
         }
-
-        button {
-            padding: 10px 15px;
+        .license-plate {
+            display: block;
+            margin-bottom: 20px;
+            width: 300px;
+            height: 70px;
+            font-size: 36px;
+            text-align: center;
+            background-color: #FFD700;
+            border: 2px solid #333;
+            border-radius: 5px;
+            color: #000;
+            letter-spacing: 4px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 10px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .scanner-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .camera-icon {
             font-size: 16px;
             cursor: pointer;
+            margin-right: 10px;
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
         }
-
+        .camera-icon:hover {
+            background-color: #2980b9;
+        }
+        .output {
+            flex: 1;
+            margin: 0;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            font-size: 14px;
+            text-align: left;
+            max-width: 300px;
+        }
+        button {
+            display: block;
+            margin: 20px auto;
+            width: 200px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
         footer {
             margin-top: 20px;
-            font-size: 12px;
+            font-size: 14px;
+            color: #888;
+        }
+        /* New style to adjust video size */
+        video {
+            width: 300px; /* Adjust width */
+            height: auto; /* Maintain aspect ratio */
+            display: block; /* Ensure it occupies space */
+            margin: 0 auto; /* Center video */
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.js"></script>
 </head>
 <body>
-    <h1>QR/Barcode Scanner</h1>
+    <h1>Scan QR/Barcode</h1>
+    <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter vehicle number">
     <div id="scanners">
-        <!-- QR reader container -->
-        <div id="qr-reader" class="qr-reader"></div>
-        <button id="start-camera">Start Camera</button>
-        <div id="qr-reader-results"></div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-0">&#x1F4F7; Scan</div>
+            <video id="qr-reader-0" style="display: none;"></video>
+            <div class="output" id="qr-reader-results-0">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-1">&#x1F4F7; Scan</div>
+            <video id="qr-reader-1" style="display: none;"></video>
+            <div class="output" id="qr-reader-results-1">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-2">&#x1F4F7; Scan</div>
+            <video id="qr-reader-2" style="display: none;"></video>
+            <div class="output" id="qr-reader-results-2">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-3">&#x1F4F7; Scan</div>
+            <video id="qr-reader-3" style="display: none;"></video>
+            <div class="output" id="qr-reader-results-3">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-4">&#x1F4F7; Scan</div>
+            <video id="qr-reader-4" style="display: none;"></video>
+            <div class="output" id="qr-reader-results-4">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-5">&#x1F4F7; Scan</div>
+            <video id="qr-reader-5" style="display: none;"></video>
+            <div class="output" id="qr-reader-results-5">No code scanned yet</div>
+        </div>
     </div>
     <button id="submit" disabled>Submit</button>
     <footer>This website was developed by Yarin Waizman</footer>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!window.Quagga) {
-                console.error('QuaggaJS library not loaded!');
-                return;
-            }
-
+       document.addEventListener('DOMContentLoaded', () => {
             const submitButton = document.getElementById('submit');
-            const resultsDiv = document.getElementById('qr-reader-results');
-            let scannedCodes = [];
+            const vehicleNumberInput = document.getElementById('vehicle-number');
+            let scannedCodes = Array(6).fill('');
 
-            function onScanSuccess(decodedText) {
+            function onScanSuccess(decodedText, result) {
                 console.log(`QR Code Scanned: ${decodedText}`);
-                resultsDiv.innerText = `Scanned Code: ${decodedText}`;
-                scannedCodes.push(decodedText);
+                document.getElementById(`qr-reader-results-0`).innerText = `Scanned Code: ${decodedText}`;
+                scannedCodes[0] = decodedText;
                 submitButton.disabled = false;
             }
 
-            // Add event listener to the "Start Camera" button
-            document.getElementById('start-camera').addEventListener('click', () => {
-                const qrReader = document.getElementById('qr-reader');
-                qrReader.style.display = 'block'; // Show the video element
-
-                Quagga.init({
-                    inputStream: {
-                        name: "Live",
-                        type: "LiveStream",
-                        target: qrReader,
-                        constraints: {
-                            facingMode: "environment", // Use the back camera
-                            width: { ideal: 1280 }, 
-                            height: { ideal: 720 } 
-                        }
+            function createScanner(index) {
+                const qrReader = document.getElementById(`qr-reader-${index}`);
+                const scanner = new Quagga.Scanner({
+                    locate: true,
+                    readers: {
+                        code_39: { enabled: true },
+                        code_128: { enabled: true },
+                        ean_reader: { enabled: true },
+                        upc_reader: { enabled: true }
                     },
-                    decoder: {
-                        readers: [
-                            "code_128_reader",
-                            "ean_reader",
-                            "ean_8_reader",
-                            "code_39_reader",
-                            "upc_reader"
-                        ]
+                    camera: {
+                        result: document.getElementById(`qr-reader-results-${index}`),
+                        locate: true,
+                        showVideoFinder: false,
+                        disableScanner: false,
+                        playSoundOnScan: true,
+                        showMicrophoneId: false,
+                        showCameraId: false,
+                        cameraId: '0'
                     }
-                }, (err) => {
-                    if (err) {
-                        console.error('Could not initialize Quagga:', err);
-                        return;
-                    }
-                    console.log('Quagga initialized for scanner');
-                    Quagga.start(); // Start the scanner
-                    Quagga.onDetected((data) => {
-                        onScanSuccess(data.codeResult.code);
+                });
+
+                scanner.addListener('scan', (result) => {
+                    onScanSuccess(result.code, result);
+                });
+
+                document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
+                    Quagga.initScanner({
+                        locator: { camera: '0' },
+                        numRetries: 3,
+                        decode: { readers: ['code_39', 'code_128', 'ean_13', 'upc'] }
+                    }, (err) => {
+                        if (err) {
+                            console.error('Could not initialize scanner:', err);
+                        } else {
+                            scanner.start();
+                        }
                     });
                 });
-            });
+            }
+
+            for (let i = 0; i < 6; i++) {
+                createScanner(i);
+            }
 
             submitButton.addEventListener('click', () => {
-                if (scannedCodes.length > 0) {
-                    console.log("Submitting codes:", scannedCodes);
+                const vehicleNumber = vehicleNumberInput.value;
+                if (scannedCodes.some(code => code) && vehicleNumber) {
+                    console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
                     fetch('https://qrscanner-6dow.onrender.com/submit', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ codes: scannedCodes })
+                        body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
                     })
                     .then(response => response.json())
                     .then(data => {
@@ -114,7 +210,7 @@
                     })
                     .catch(error => console.error('Error:', error));
                 } else {
-                    console.log("No scanned codes to submit.");
+                    console.log("No scanned codes or vehicle number to submit.");
                 }
             });
 

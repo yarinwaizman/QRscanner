@@ -160,6 +160,13 @@
                         }
                     }).catch((e) => console.error(e));
                 });
+                document.addEventListener('DOMContentLoaded', () => {
+    if (!window.Instascan) {
+        console.error('Instascan library not loaded!');
+        return;
+    }
+});
+
             }
 
             for (let i = 0; i < 6; i++) {

@@ -118,16 +118,12 @@ footer {
     
     <!-- Input for vehicle number styled as a license plate -->
     <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter vehicle number">
-
+    
+    <div id="qr-reader" style="width:500px"></div>
+    <div id="qr-reader-results"></div>
+    
    
     <!-- Scanners -->
-    <div class="scanner-container">
-        <div class="camera-icon" id="start-camera-1">&#x1F4F7; Start Camera 1</div>
-        <video id="video-1" class="video-container" autoplay></video>
-        <button id="switch-camera-1">Switch Camera</button>
-        <div class="output">Scanned Code 1: <span id="scanned-result-1"></span></div>
-    </div>
-    
     <div class="scanner-container">
         <div class="camera-icon" id="start-camera-1">&#x1F4F7; Scan</div>
         <video id="video-1" class="video-container" autoplay></video>
@@ -159,7 +155,8 @@ footer {
         <div class="output">Scanned Code 6: <span id="scanned-result-6"></span></div>
     </div>
     
-    
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+
     <!-- Submit button -->
     <button id="submit">Submit</button>
 

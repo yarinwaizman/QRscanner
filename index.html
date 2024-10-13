@@ -148,9 +148,12 @@
 
             function createScanner(index) {
                 const qrReader = document.getElementById(`qr-reader-${index}`);
-                
+
                 // Add event listener to the "Scan" button to start scanning
                 document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
+                    // Show the video element
+                    qrReader.style.display = 'block';
+
                     // Initialize the scanner when the button is clicked
                     Quagga.init({
                         inputStream: {
@@ -178,7 +181,6 @@
                             return;
                         }
                         console.log(`Quagga initialized for scanner ${index}`);
-                        qrReader.style.display = 'block'; // Make video element visible
                         Quagga.start(); // Start the scanner
                         Quagga.onDetected((data) => {
                             onScanSuccess(data.codeResult.code, index);

@@ -153,14 +153,19 @@
                     qrReader.style.display = 'block';
                     const codeReader = new ZXing.BrowserQRCodeReader();
                     console.log('QR code reader initialized');
-                    
+
                     codeReader.getVideoInputDevices()
                         .then((videoInputDevices) => {
-                            // Filter for environment cameras
-                            const environmentDevices = videoInputDevices.filter(device => device.kind === 'videoinput' && device.label.includes('environment'));
-                            const firstDeviceId = environmentDevices.length > 0 ? environmentDevices[0].deviceId : videoInputDevices[0].deviceId;
+                            console.log('Available video input devices:', videoInputDevices); // Log available devices
+                            
+                            // Attempt to select the rear camera based on its facing mode
+                            const rearCamera = videoInputDevices.find(device => device.label.toLowerCase().includes('back')) || 
+                                                videoInputDevices.find(device => device.label.toLowerCase().includes('environment')) || 
+                                                videoInputDevices[0]; // Fallback to the first available device
 
-                            codeReader.decodeFromVideoDevice(firstDeviceId, qrReader, (result, err) => {
+                            console.log('Using camera:', rearCamera); // Log which camera is being used
+                            
+                            codeReader.decodeFromVideoDevice(rearCamera.deviceId, qrReader, (result, err) => {
                                 if (result) {
                                     console.log(result);
                                     onScanSuccess(result.text, index);
@@ -171,7 +176,7 @@
                                     document.getElementById(`qr-reader-results-${index}`).textContent = `Error: ${err}`;
                                 }
                             }, {
-                                facingMode: "environment" // Ensure rear camera is used
+                                facingMode: { exact: "environment" } // Ensure rear camera is used
                             });
                         })
                         .catch((err) => {

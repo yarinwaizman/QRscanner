@@ -5,14 +5,16 @@ from flask_cors import CORS
 from datetime import datetime
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for your Flask app
+CORS(app)
 
 # Use a writable directory for the Excel file path
 EXCEL_FILE_PATH = os.getenv('EXCEL_FILE_PATH', '/tmp/data.xlsx')
 print(f"Using Excel file path: {EXCEL_FILE_PATH}")
 
 # Ensure the directory exists
-os.makedirs(os.path.dirname(EXCEL_FILE_PATH), exist_ok=True)
+if not os.path.exists(os.path.dirname(EXCEL_FILE_PATH)):
+    print(f"Creating directory: {os.path.dirname(EXCEL_FILE_PATH)}")
+    os.makedirs(os.path.dirname(EXCEL_FILE_PATH), exist_ok=True)
 
 # Load the existing Excel file or create a new one
 def load_excel():
@@ -27,9 +29,12 @@ def load_excel():
 
 # Save the DataFrame back to the Excel file
 def save_excel(df):
-    print(f"Saving to {EXCEL_FILE_PATH}")
-    df.to_excel(EXCEL_FILE_PATH, index=False)
-    print("Save complete")
+    try:
+        print(f"Saving to {EXCEL_FILE_PATH}")
+        df.to_excel(EXCEL_FILE_PATH, index=False)
+        print("Save complete")
+    except Exception as e:
+        print(f"Error saving to {EXCEL_FILE_PATH}: {e}")
 
 @app.route('/')
 def home():

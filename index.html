@@ -68,15 +68,6 @@
             text-align: left;
             max-width: 300px;
         }
-        .video-container {
-            display: none;
-            width: 100%;
-            max-width: 200px;
-            height: auto;
-            margin-bottom: 20px;
-            border: 2px solid #333;
-            border-radius: 10px;
-        }
         button {
             display: block;
             margin: 20px auto;
@@ -103,7 +94,37 @@
     <h1>Scan QR/Barcode</h1>
     <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter vehicle number">
     <div id="scanners">
-        <!-- Scanner containers will be generated here -->
+        <!-- Six Scanner containers -->
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-0">&#x1F4F7; Scan</div>
+            <div id="qr-reader-0" style="width: 500px; display: none;"></div>
+            <div class="output" id="qr-reader-results-0">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-1">&#x1F4F7; Scan</div>
+            <div id="qr-reader-1" style="width: 500px; display: none;"></div>
+            <div class="output" id="qr-reader-results-1">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-2">&#x1F4F7; Scan</div>
+            <div id="qr-reader-2" style="width: 500px; display: none;"></div>
+            <div class="output" id="qr-reader-results-2">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-3">&#x1F4F7; Scan</div>
+            <div id="qr-reader-3" style="width: 500px; display: none;"></div>
+            <div class="output" id="qr-reader-results-3">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-4">&#x1F4F7; Scan</div>
+            <div id="qr-reader-4" style="width: 500px; display: none;"></div>
+            <div class="output" id="qr-reader-results-4">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-5">&#x1F4F7; Scan</div>
+            <div id="qr-reader-5" style="width: 500px; display: none;"></div>
+            <div class="output" id="qr-reader-results-5">No code scanned yet</div>
+        </div>
     </div>
     <button id="submit" disabled>Submit</button>
     <footer>This website was developed by Yarin Waizman</footer>
@@ -128,16 +149,6 @@
             }
 
             function createScanner(index) {
-                const container = document.createElement('div');
-                container.className = 'scanner-container';
-                container.innerHTML = `
-                    <div class="camera-icon" id="start-camera-${index}">&#x1F4F7; Scan</div>
-                    <div id="qr-reader-${index}" style="width: 500px; display: none;"></div>
-                    <div class="output" id="qr-reader-results-${index}">No code scanned yet</div>
-                `;
-                scannersContainer.appendChild(container);
-
-                const startCameraButton = document.getElementById(`start-camera-${index}`);
                 const qrReader = document.getElementById(`qr-reader-${index}`);
                 const html5QrCode = new Html5Qrcode(`qr-reader-${index}`);
                 const qrCodeScannerConfig = {
@@ -145,7 +156,7 @@
                     qrbox: 250
                 };
 
-                startCameraButton.addEventListener('click', () => {
+                document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
                     console.log(`Starting camera ${index}...`);
                     qrReader.style.display = 'block';
                     html5QrCode.start(

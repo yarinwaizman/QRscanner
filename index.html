@@ -89,12 +89,12 @@
             color: #888;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/instascan/1.0.0/instascan.min.js"></script>
 </head>
 <body>
     <h1>Scan QR/Barcode</h1>
     <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter vehicle number">
     <div id="scanners">
-        <!-- Six Scanner containers -->
         <div class="scanner-container">
             <div class="camera-icon" id="start-camera-0">&#x1F4F7; Scan</div>
             <div id="qr-reader-0" style="width: 500px; display: none;"></div>
@@ -128,63 +128,65 @@
     </div>
     <button id="submit" disabled>Submit</button>
     <footer>This website was developed by Yarin Waizman</footer>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/instascan/1.0.0/instascan.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-    const submitButton = document.getElementById('submit');
-    const vehicleNumberInput = document.getElementById('vehicle-number');
-    let scannedCodes = Array(6).fill('');
+            const submitButton = document.getElementById('submit');
+            const vehicleNumberInput = document.getElementById('vehicle-number');
+            let scannedCodes = Array(6).fill('');
 
-    function onScanSuccess(decodedText, index) {
-        console.log(`QR Code Scanned: ${decodedText}`);
-        document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
-        scannedCodes[index] = decodedText;
-        submitButton.disabled = false;
-    }
+            function onScanSuccess(decodedText, index) {
+                console.log(`QR Code Scanned: ${decodedText}`);
+                document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
+                scannedCodes[index] = decodedText;
+                submitButton.disabled = false;
+            }
 
-    function createScanner(index) {
-        const qrReader = document.getElementById(`qr-reader-${index}`);
-        const scanner = new Instascan.Scanner({ video: qrReader });
+            function createScanner(index) {
+                const qrReader = document.getElementById(`qr-reader-${index}`);
+                const scanner = new Instascan.Scanner({ video: qrReader });
 
-        scanner.addListener('scan', (content) => {
-            onScanSuccess(content, index);
-        });
+                scanner.addListener('scan', (content) => {
+                    onScanSuccess(content, index);
+                });
 
-        document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
-            Instascan.Camera.getCameras().then((cameras) => {
-                if (cameras.length > 0) {
-                    scanner.start(cameras[0]); // You can select different cameras if needed
+                document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
+                    Instascan.Camera.getCameras().then((cameras) => {
+                        if (cameras.length > 0) {
+                            scanner.start(cameras[0]); // You can select different cameras if needed
+                        } else {
+                            console.error('No cameras found.');
+                        }
+                    }).catch((e) => console.error(e));
+                });
+            }
+
+            for (let i = 0; i < 6; i++) {
+                createScanner(i);
+            }
+
+            submitButton.addEventListener('click', () => {
+                const vehicleNumber = vehicleNumberInput.value;
+                if (scannedCodes.some(code => code) && vehicleNumber) {
+                    console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
+                    fetch('https://qrscanner-6dow.onrender.com/submit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        alert("Data saved successfully!");
+                        location.reload();
+                    })
+                    .catch(error => console.error('Error:', error));
                 } else {
-                    console.error('No cameras found.');
+                    console.log("No scanned codes or vehicle number to submit.");
                 }
-            }).catch((e) => console.error(e));
+            });
+
+            console.log('DOM fully loaded and parsed');
         });
-    }
-
-    for (let i = 0; i < 6; i++) {
-        createScanner(i);
-    }
-
-    submitButton.addEventListener('click', () => {
-        const vehicleNumber = vehicleNumberInput.value;
-        if (scannedCodes.some(code => code) && vehicleNumber) {
-            console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
-            fetch('https://qrscanner-6dow.onrender.com/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                alert("Data saved successfully!");
-                location.reload();
-            })
-            .catch(error => console.error('Error:', error));
-        } else {
-            console.log("No scanned codes or vehicle number to submit.");
-        }
-    });
-
-    console.log('DOM fully loaded and parsed');
-});
+    </script>
+</body>
+</html>

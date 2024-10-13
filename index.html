@@ -128,7 +128,11 @@
     </div>
     <button id="submit" disabled>Submit</button>
     <footer>This website was developed by Yarin Waizman</footer>
+    
+    <!-- Load HTML5 QR Code Library -->
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    
+    <!-- Your Script -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const scannersContainer = document.getElementById('scanners');
@@ -153,7 +157,7 @@
                 const html5QrCode = new Html5Qrcode(`qr-reader-${index}`);
                 const qrCodeScannerConfig = {
                     fps: 10,
-                    qrbox: { width: 250, height: 250 }, // Make sure qrbox is not too large
+                    qrbox: { width: 250, height: 250 }, // Ensure this is not too large
                 };
 
                 document.getElementById(`start-camera-${index}`).addEventListener('click', () => {

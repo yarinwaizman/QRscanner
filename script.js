@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Ensure qrbox is not larger than container
             const qrCodeScannerConfig = {
                 fps: 10,
-                qrbox: Math.min(300, containerWidth * 0.9)  // Set qrbox to 80% of container width or max 250px
+                
             };
     
             console.log(`Starting camera ${index} with qrbox size: ${qrCodeScannerConfig.qrbox}...`);

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR/Barcode Scanner</title>
     <style>
-        body {
+     body {
     font-family: 'Arial', sans-serif;
     background-color: #f5f5f5;
     color: #333;
@@ -38,60 +38,22 @@ h1 {
     background-image: linear-gradient(90deg, #FFD700, #FFD700 90%, #0000FF 90%, #0000FF); /* Israeli plate colors */
 }
 
-.video-container {
-    display: none;
-    width: 100%;
-    max-width: 200px;
-    height: auto;
-    margin-bottom: 20px;
-    border: 2px solid #333;
-    border-radius: 10px;
-}
-
-.output {
-    margin-top: 15px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #fff;
-    font-size: 14px; 
-    text-align: left;
-    width: 60%;
+.scanner-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    width: 80%;  
     margin-left: auto;
     margin-right: auto;
-}
-
-input, button {
-    display: block;
-    margin-bottom: 20px;
-    width: 60%;
-    padding: 15px;
-    font-size: 16px;
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 5px;
-    border: 1px solid #333;
-}
-
-button {
-    background-color: #3498db;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background-color: #2980b9;
 }
 
 .camera-icon {
-    font-size: 20px;
+    font-size: 16px;
     cursor: pointer;
-    margin-bottom: 20px;
+    margin-right: 10px;
     display: inline-block;
-    width: 60%;
-    text-align: center;
-    padding: 10px;
+    padding: 5px 10px;
     background-color: #3498db;
     color: white;
     border-radius: 5px;
@@ -102,11 +64,43 @@ button:hover {
     background-color: #2980b9;
 }
 
-.scanner-container {
-    margin-bottom: 10px;
-    width: 60%;  
-    margin-left: auto;
-    margin-right: auto;
+.output {
+    flex: 1;
+    margin: 0;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    font-size: 14px; 
+    text-align: left;
+    max-width: 300px;
+}
+
+.video-container {
+    display: none;
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 20px;
+    border: 2px solid #333;
+    border-radius: 10px;
+}
+
+button {
+    display: block;
+    margin: 20px auto;
+    width: 200px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
 }
 
 footer {
@@ -115,9 +109,11 @@ footer {
     color: #888;
 }
 
+
     </style>
 </head>
 <body>
+    
     <h1>Scan QR/Barcode</h1>
     
     <!-- Input for vehicle number styled as a license plate -->
@@ -125,33 +121,27 @@ footer {
 
     <!-- Scanners -->
     <div class="scanner-container">
-        <div class="camera-icon" id="start-camera-1">&#x1F4F7; Start Camera 1</div>
-        <video id="video-1" class="video-container" autoplay></video>
+        <div class="camera-icon" id="start-camera-1">&#x1F4F7; Camera 1</div>
         <div class="output">Scanned Code 1: <span id="scanned-result-1"></span></div>
     </div>
     <div class="scanner-container">
-        <div class="camera-icon" id="start-camera-2">&#x1F4F7; Start Camera 2</div>
-        <video id="video-2" class="video-container" autoplay></video>
+        <div class="camera-icon" id="start-camera-2">&#x1F4F7; Camera 2</div>
         <div class="output">Scanned Code 2: <span id="scanned-result-2"></span></div>
     </div>
     <div class="scanner-container">
-        <div class="camera-icon" id="start-camera-3">&#x1F4F7; Start Camera 3</div>
-        <video id="video-3" class="video-container" autoplay></video>
+        <div class="camera-icon" id="start-camera-3">&#x1F4F7; Camera 3</div>
         <div class="output">Scanned Code 3: <span id="scanned-result-3"></span></div>
     </div>
     <div class="scanner-container">
-        <div class="camera-icon" id="start-camera-4">&#x1F4F7; Start Camera 4</div>
-        <video id="video-4" class="video-container" autoplay></video>
+        <div class="camera-icon" id="start-camera-4">&#x1F4F7; Camera 4</div>
         <div class="output">Scanned Code 4: <span id="scanned-result-4"></span></div>
     </div>
     <div class="scanner-container">
-        <div class="camera-icon" id="start-camera-5">&#x1F4F7; Start Camera 5</div>
-        <video id="video-5" class="video-container" autoplay></video>
+        <div class="camera-icon" id="start-camera-5">&#x1F4F7; Camera 5</div>
         <div class="output">Scanned Code 5: <span id="scanned-result-5"></span></div>
     </div>
     <div class="scanner-container">
-        <div class="camera-icon" id="start-camera-6">&#x1F4F7; Start Camera 6</div>
-        <video id="video-6" class="video-container" autoplay></video>
+        <div class="camera-icon" id="start-camera-6">&#x1F4F7; Camera 6</div>
         <div class="output">Scanned Code 6: <span id="scanned-result-6"></span></div>
     </div>
     
@@ -172,7 +162,7 @@ footer {
             document.getElementById('video-5'),
             document.getElementById('video-6')
         ];
-
+    
         const scannedResultElements = [
             document.getElementById('scanned-result-1'),
             document.getElementById('scanned-result-2'),
@@ -181,7 +171,7 @@ footer {
             document.getElementById('scanned-result-5'),
             document.getElementById('scanned-result-6')
         ];
-
+    
         const startCameraButtons = [
             document.getElementById('start-camera-1'),
             document.getElementById('start-camera-2'),
@@ -190,15 +180,15 @@ footer {
             document.getElementById('start-camera-5'),
             document.getElementById('start-camera-6')
         ];
-
+    
         const submitButton = document.getElementById('submit');
         const vehicleNumberInput = document.getElementById('vehicle-number');
-
+    
         // Create instance of the ZXing BarcodeReader
         const codeReader = new ZXing.BrowserMultiFormatReader();
-        
+    
         const scannedCodes = Array(6).fill('');
-
+    
         // Function to start the camera
         function startCamera(index) {
             videoElements[index].style.display = 'block';
@@ -221,12 +211,12 @@ footer {
                 })
                 .catch(err => console.error(err));
         }
-
+    
         // Event listeners for the camera icons
         startCameraButtons.forEach((button, index) => {
             button.addEventListener('click', () => startCamera(index));
         });
-
+    
         // Event listener for the submit button
         submitButton.addEventListener('click', () => {
             const vehicleNumber = vehicleNumberInput.value;
@@ -241,12 +231,17 @@ footer {
                     body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
                 })
                 .then(response => response.json())
-                .then(data => console.log('Success:', data))
+                .then(data => {
+                    console.log('Success:', data);
+                    alert("Data saved successfully!"); // Display message box
+                    location.reload(); // Reload the page
+                })
                 .catch(error => console.error('Error:', error));
             } else {
                 console.log("No scanned codes or vehicle number to submit.");
             }
         });
     </script>
+    
 </body>
 </html>

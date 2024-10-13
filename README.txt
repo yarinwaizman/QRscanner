@@ -7,3 +7,5 @@ cmd - cd [path] app.py
 cmd - curl -X POST http://localhost:5000/submit -H "Content-Type: application/json" -d "{\"vehicleNumber\":\"XYZ123\", \"codes\": [\"12345ABC\"]}"
 
 3. open index.html run a test and check developers mode [F12] to verify "data saved successfully!"
+
+4. download data - https://your-app-url.onrender.com/download

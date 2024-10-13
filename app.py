@@ -8,13 +8,16 @@ app = Flask(__name__)
 CORS(app)
 
 # Use a writable directory for the Excel file path
-EXCEL_FILE_PATH = os.getenv('EXCEL_FILE_PATH', '/tmp/data.xlsx')
+EXCEL_FILE_PATH = '/tmp/data.xlsx'
 print(f"Using Excel file path: {EXCEL_FILE_PATH}")
 
-# Ensure the directory exists
+# Ensure the directory exists (only if writable)
 if not os.path.exists(os.path.dirname(EXCEL_FILE_PATH)):
-    print(f"Creating directory: {os.path.dirname(EXCEL_FILE_PATH)}")
-    os.makedirs(os.path.dirname(EXCEL_FILE_PATH), exist_ok=True)
+    try:
+        os.makedirs(os.path.dirname(EXCEL_FILE_PATH), exist_ok=True)
+        print(f"Directory created: {os.path.dirname(EXCEL_FILE_PATH)}")
+    except OSError as e:
+        print(f"Error creating directory: {e}")
 
 # Load the existing Excel file or create a new one
 def load_excel():

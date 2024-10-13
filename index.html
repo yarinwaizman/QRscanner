@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Scanner with ZXing-js</title>
+    <title>QR/Barcode Scanner</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -17,11 +17,56 @@
             font-size: 2.5em;
             margin-bottom: 20px;
         }
-        video {
-            width: 500px;
-            height: auto;
+        .license-plate {
+            display: block;
+            margin-bottom: 20px;
+            width: 300px;
+            height: 70px;
+            font-size: 36px;
+            text-align: center;
+            background-color: #FFD700;
+            border: 2px solid #333;
+            border-radius: 5px;
+            color: #000;
+            letter-spacing: 4px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 10px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .scanner-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .camera-icon {
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .camera-icon:hover {
+            background-color: #2980b9;
+        }
+        .output {
+            flex: 1;
+            margin: 0;
+            padding: 5px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            background-color: #fff;
+            font-size: 14px;
+            text-align: left;
+            max-width: 300px;
         }
         button {
             display: block;
@@ -38,46 +83,120 @@
         button:hover {
             background-color: #2980b9;
         }
-        .output {
+        footer {
             margin-top: 20px;
-            font-size: 18px;
+            font-size: 14px;
+            color: #888;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.18.6/umd/index.min.js"></script>
 </head>
 <body>
-    <h1>QR Code Scanner</h1>
-    <button id="startScan">Start Scan</button>
-    <video id="video" style="display: none;"></video>
-    <div class="output" id="result">No code scanned yet</div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.18.6/umd/index.min.js"></script>
+    <h1>Scan QR/Barcode</h1>
+    <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter vehicle number">
+    <div id="scanners">
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-0">&#x1F4F7; Scan</div>
+            <video id="qr-reader-0" style="width: 500px; display: none;"></video>
+            <div class="output" id="qr-reader-results-0">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-1">&#x1F4F7; Scan</div>
+            <video id="qr-reader-1" style="width: 500px; display: none;"></video>
+            <div class="output" id="qr-reader-results-1">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-2">&#x1F4F7; Scan</div>
+            <video id="qr-reader-2" style="width: 500px; display: none;"></video>
+            <div class="output" id="qr-reader-results-2">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-3">&#x1F4F7; Scan</div>
+            <video id="qr-reader-3" style="width: 500px; display: none;"></video>
+            <div class="output" id="qr-reader-results-3">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-4">&#x1F4F7; Scan</div>
+            <video id="qr-reader-4" style="width: 500px; display: none;"></video>
+            <div class="output" id="qr-reader-results-4">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-5">&#x1F4F7; Scan</div>
+            <video id="qr-reader-5" style="width: 500px; display: none;"></video>
+            <div class="output" id="qr-reader-results-5">No code scanned yet</div>
+        </div>
+    </div>
+    <button id="submit" disabled>Submit</button>
+    <footer>This website was developed by Yarin Waizman</footer>
     <script>
-        document.getElementById('startScan').addEventListener('click', () => {
-            const codeReader = new ZXing.BrowserQRCodeReader();
-            console.log('QR code reader initialized');
+        document.addEventListener('DOMContentLoaded', () => {
+            const submitButton = document.getElementById('submit');
+            const vehicleNumberInput = document.getElementById('vehicle-number');
+            let scannedCodes = Array(6).fill('');
 
-            codeReader.getVideoInputDevices()
-                .then((videoInputDevices) => {
-                    const firstDeviceId = videoInputDevices[0].deviceId;
-                    const video = document.getElementById('video');
-                    video.style.display = 'block';
+            function onScanSuccess(decodedText, index) {
+                console.log(`QR Code Scanned: ${decodedText}`);
+                document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
+                scannedCodes[index] = decodedText;
+                submitButton.disabled = false;
+            }
 
-                    codeReader.decodeFromVideoDevice(firstDeviceId, 'video', (result, err) => {
-                        if (result) {
-                            console.log(result);
-                            document.getElementById('result').textContent = `Scanned Code: ${result.text}`;
-                            codeReader.reset();
-                        }
-                        if (err && !(err instanceof ZXing.NotFoundException)) {
+            function createScanner(index) {
+                const qrReader = document.getElementById(`qr-reader-${index}`);
+                document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
+                    qrReader.style.display = 'block';
+                    const codeReader = new ZXing.BrowserQRCodeReader();
+                    console.log('QR code reader initialized');
+                    
+                    codeReader.getVideoInputDevices()
+                        .then((videoInputDevices) => {
+                            const firstDeviceId = videoInputDevices[0].deviceId;
+
+                            codeReader.decodeFromVideoDevice(firstDeviceId, qrReader, (result, err) => {
+                                if (result) {
+                                    console.log(result);
+                                    onScanSuccess(result.text, index);
+                                    codeReader.reset();
+                                }
+                                if (err && !(err instanceof ZXing.NotFoundException)) {
+                                    console.error(err);
+                                    document.getElementById(`qr-reader-results-${index}`).textContent = `Error: ${err}`;
+                                }
+                            });
+                        })
+                        .catch((err) => {
                             console.error(err);
-                            document.getElementById('result').textContent = `Error: ${err}`;
-                        }
-                    });
-                })
-                .catch((err) => {
-                    console.error(err);
-                    document.getElementById('result').textContent = `Error: ${err}`;
+                            document.getElementById(`qr-reader-results-${index}`).textContent = `Error: ${err}`;
+                        });
                 });
+            }
+
+            for (let i = 0; i < 6; i++) {
+                createScanner(i);
+            }
+
+            submitButton.addEventListener('click', () => {
+                const vehicleNumber = vehicleNumberInput.value;
+                if (scannedCodes.some(code => code) && vehicleNumber) {
+                    console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
+                    fetch('https://qrscanner-6dow.onrender.com/submit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        alert("Data saved successfully!");
+                        location.reload();
+                    })
+                    .catch(error => console.error('Error:', error));
+                } else {
+                    console.log("No scanned codes or vehicle number to submit.");
+                }
+            });
+            
+            console.log('DOM fully loaded and parsed');
         });
     </script>
 </body>

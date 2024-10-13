@@ -23,24 +23,47 @@ Quagga.onDetected(function(result) {
 });
 
 function startCamera(index) {
-    videoElements[index].style.display = 'block';
-    startCameraButtons[index].style.display = 'none';
-    codeReader
-        .listVideoInputDevices()
-        .then(videoInputDevices => {
-            const firstDeviceId = videoInputDevices[0].deviceId;
-            codeReader.decodeFromVideoDevice(firstDeviceId, videoElements[index].id, (result, err) => {
-                if (result) {
-                    scannedResultElements[index].textContent = result.text;
-                    scannedCodes[index] = result.text;
-                    videoElements[index].style.display = 'none'; // Hide camera after scanning
-                    console.log(`Scanned result ${index + 1}:`, result.text);
-                }
-                if (err && !(err instanceof ZXing.NotFoundException)) {
-                    console.error(err);
-                }
-            });
-        })
-        .catch(err => console.error(err));
+    if (videoElements[index]) {
+        videoElements[index].style.display = 'block';
+        startCameraButtons[index].style.display = 'none';
+        codeReader
+            .listVideoInputDevices()
+            .then(videoInputDevices => {
+                const firstDeviceId = videoInputDevices[0].deviceId;
+                codeReader.decodeFromVideoDevice(firstDeviceId, videoElements[index].id, (result, err) => {
+                    if (result) {
+                        scannedResultElements[index].textContent = result.text;
+                        scannedCodes[index] = result.text;
+                        videoElements[index].style.display = 'none'; // Hide camera after scanning
+                        console.log(`Scanned result ${index + 1}:`, result.text);
+                    }
+                    if (err && !(err instanceof ZXing.NotFoundException)) {
+                        console.error(err);
+                    }
+                });
+            })
+            .catch(err => console.error(err));
+    } else {
+        console.error(`Video element not found for index ${index}`);
+    }
 }
+
+
+const videoElements = [
+    document.getElementById('video-1'),
+    document.getElementById('video-2'),
+    document.getElementById('video-3'),
+    document.getElementById('video-4'),
+    document.getElementById('video-5'),
+    document.getElementById('video-6')
+];
+
+const startCameraButtons = [
+    document.getElementById('start-camera-1'),
+    document.getElementById('start-camera-2'),
+    document.getElementById('start-camera-3'),
+    document.getElementById('start-camera-4'),
+    document.getElementById('start-camera-5'),
+    document.getElementById('start-camera-6')
+];
 

@@ -25,27 +25,28 @@ Quagga.onDetected(function(result) {
 function startCamera(index) {
     videoElements[index].style.display = 'block';
     startCameraButtons[index].style.display = 'none';
-    const constraints = {
-        video: {
-            facingMode: { ideal: 'environment' } // Prefer rear camera
-        }
-    };
-    navigator.mediaDevices.getUserMedia(constraints)
+
+    navigator.mediaDevices.enumerateDevices()
+        .then(devices => {
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+            let rearCamera = videoDevices.find(device => device.label.toLowerCase().includes('back')) || videoDevices[0];
+            const constraints = {
+                video: {
+                    deviceId: { exact: rearCamera.deviceId }
+                }
+            };
+            return navigator.mediaDevices.getUserMedia(constraints);
+        })
         .then(stream => {
             videoElements[index].srcObject = stream;
             videoElements[index].play();
         })
         .catch(err => {
-            console.error('Error accessing rear camera:', err);
-            // Fallback to the default camera
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => {
-                    videoElements[index].srcObject = stream;
-                    videoElements[index].play();
-                })
-                .catch(err => console.error('Error accessing camera:', err));
+            console.error('Error accessing camera:', err);
+            alert('Unable to access the rear camera. Please ensure camera permissions are enabled.');
         });
 }
+
 
 
 

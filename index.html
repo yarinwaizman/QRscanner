@@ -88,7 +88,6 @@
             font-size: 14px;
             color: #888;
         }
-        /* New style to adjust video size */
         video {
             width: 300px; /* Adjust width */
             height: auto; /* Maintain aspect ratio */
@@ -96,101 +95,98 @@
             margin: 0 auto; /* Center video */
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
 </head>
 <body>
     <h1>Scan QR/Barcode</h1>
     <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter vehicle number">
+    
     <div id="scanners">
+        <!-- Repeat for six scanners -->
         <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-0">&#x1F4F7; Scan</div>
+            <div class="camera-icon" id="start-camera-0">&#x1F4F7; Scan 1</div>
             <video id="qr-reader-0" style="display: none;"></video>
             <div class="output" id="qr-reader-results-0">No code scanned yet</div>
         </div>
         <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-1">&#x1F4F7; Scan</div>
+            <div class="camera-icon" id="start-camera-1">&#x1F4F7; Scan 2</div>
             <video id="qr-reader-1" style="display: none;"></video>
             <div class="output" id="qr-reader-results-1">No code scanned yet</div>
         </div>
         <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-2">&#x1F4F7; Scan</div>
+            <div class="camera-icon" id="start-camera-2">&#x1F4F7; Scan 3</div>
             <video id="qr-reader-2" style="display: none;"></video>
             <div class="output" id="qr-reader-results-2">No code scanned yet</div>
         </div>
         <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-3">&#x1F4F7; Scan</div>
+            <div class="camera-icon" id="start-camera-3">&#x1F4F7; Scan 4</div>
             <video id="qr-reader-3" style="display: none;"></video>
             <div class="output" id="qr-reader-results-3">No code scanned yet</div>
         </div>
         <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-4">&#x1F4F7; Scan</div>
+            <div class="camera-icon" id="start-camera-4">&#x1F4F7; Scan 5</div>
             <video id="qr-reader-4" style="display: none;"></video>
             <div class="output" id="qr-reader-results-4">No code scanned yet</div>
         </div>
         <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-5">&#x1F4F7; Scan</div>
+            <div class="camera-icon" id="start-camera-5">&#x1F4F7; Scan 6</div>
             <video id="qr-reader-5" style="display: none;"></video>
             <div class="output" id="qr-reader-results-5">No code scanned yet</div>
         </div>
     </div>
+    
     <button id="submit" disabled>Submit</button>
     <footer>This website was developed by Yarin Waizman</footer>
+    
     <script>
-       document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             const submitButton = document.getElementById('submit');
             const vehicleNumberInput = document.getElementById('vehicle-number');
             let scannedCodes = Array(6).fill('');
 
-            function onScanSuccess(decodedText, result) {
+            function onScanSuccess(decodedText, index) {
                 console.log(`QR Code Scanned: ${decodedText}`);
-                document.getElementById(`qr-reader-results-0`).innerText = `Scanned Code: ${decodedText}`;
-                scannedCodes[0] = decodedText;
-                submitButton.disabled = false;
+                document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
+                scannedCodes[index] = decodedText;
+                submitButton.disabled = !scannedCodes.some(code => code);
             }
 
             function createScanner(index) {
-                const qrReader = document.getElementById(`qr-reader-${index}`);
-                const scanner = new Quagga.Scanner({
-                    locate: true,
-                    readers: {
-                        code_39: { enabled: true },
-                        code_128: { enabled: true },
-                        ean_reader: { enabled: true },
-                        upc_reader: { enabled: true }
-                    },
-                    camera: {
-                        result: document.getElementById(`qr-reader-results-${index}`),
-                        locate: true,
-                        showVideoFinder: false,
-                        disableScanner: false,
-                        playSoundOnScan: true,
-                        showMicrophoneId: false,
-                        showCameraId: false,
-                        cameraId: '0'
-                    }
-                });
-
-                scanner.addListener('scan', (result) => {
-                    onScanSuccess(result.code, result);
-                });
-
-                document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
-                    Quagga.initScanner({
-                        locator: { camera: '0' },
-                        numRetries: 3,
-                        decode: { readers: ['code_39', 'code_128', 'ean_13', 'upc'] }
-                    }, (err) => {
-                        if (err) {
-                            console.error('Could not initialize scanner:', err);
-                        } else {
-                            scanner.start();
+                Quagga.init({
+                    inputStream: {
+                        name: "Live",
+                        type: "LiveStream",
+                        target: document.getElementById(`qr-reader-${index}`),
+                        constraints: {
+                            facingMode: "environment" // or "user"
+                        },
+                        area: { // defines rectangle of the detection/localization area
+                            top: "0%",    // top offset
+                            right: "0%",  // right offset
+                            left: "0%",   // left offset
+                            bottom: "0%"   // bottom offset
                         }
-                    });
+                    },
+                    decoder: {
+                        readers: ["code_39_reader", "ean_reader", "upc_reader", "code_128_reader", "qr_reader"] // Added QR reader
+                    }
+                }, function(err) {
+                    if (err) {
+                        console.error('Could not initialize scanner:', err);
+                        return;
+                    }
+                    Quagga.start();
+                });
+
+                Quagga.onDetected(function(result) {
+                    onScanSuccess(result.codeResult.code, index);
                 });
             }
 
             for (let i = 0; i < 6; i++) {
-                createScanner(i);
+                document.getElementById(`start-camera-${i}`).addEventListener('click', () => {
+                    createScanner(i);
+                });
             }
 
             submitButton.addEventListener('click', () => {

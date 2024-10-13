@@ -6,106 +6,135 @@
     <title>QR/Barcode Scanner</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f8f8f8;
-        }
-
-        h1 {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
             text-align: center;
+            padding: 20px;
         }
-
-        #scanners {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
             margin-bottom: 20px;
         }
-
-        .scanner-container {
-            margin: 10px;
-        }
-
-        video {
-            width: 320px; /* Set a reasonable width */
-            height: auto; /* Maintain aspect ratio */
-            border: 2px solid #ddd;
+        .license-plate {
+            display: block;
+            margin-bottom: 20px;
+            width: 300px;
+            height: 70px;
+            font-size: 36px;
+            text-align: center;
+            background-color: #FFD700;
+            border: 2px solid #333;
             border-radius: 5px;
-            display: none; /* Hide video by default */
+            color: #000;
+            letter-spacing: 4px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 10px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
-
+        .scanner-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .camera-icon {
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .camera-icon:hover {
+            background-color: #2980b9;
+        }
         .output {
-            margin-top: 10px;
-            font-weight: bold;
-            color: #333;
+            flex: 1;
+            margin: 0;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            font-size: 14px;
+            text-align: left;
+            max-width: 300px;
         }
-
         button {
+            display: block;
+            margin: 20px auto;
+            width: 200px;
             padding: 10px 20px;
             font-size: 16px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
             border-radius: 5px;
+            background-color: #3498db;
+            color: white;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
-
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
+        button:hover {
+            background-color: #2980b9;
         }
-
         footer {
-            text-align: center;
             margin-top: 20px;
+            font-size: 14px;
+            color: #888;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.js"></script>
 </head>
 <body>
     <h1>Scan QR/Barcode</h1>
     <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter vehicle number">
-    
     <div id="scanners">
-        <!-- Repeat for six scanners -->
         <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-0">&#x1F4F7; Scan 1</div>
-            <video id="qr-reader-0" style="display: none;"></video>
+            <div class="camera-icon" id="start-camera-0">&#x1F4F7; Scan</div>
+            <video id="qr-reader-0" style="width: 500px; display: none;"></video>
             <div class="output" id="qr-reader-results-0">No code scanned yet</div>
         </div>
         <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-1">&#x1F4F7; Scan 2</div>
-            <video id="qr-reader-1" style="display: none;"></video>
+            <div class="camera-icon" id="start-camera-1">&#x1F4F7; Scan</div>
+            <video id="qr-reader-1" style="width: 500px; display: none;"></video>
             <div class="output" id="qr-reader-results-1">No code scanned yet</div>
         </div>
         <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-2">&#x1F4F7; Scan 3</div>
-            <video id="qr-reader-2" style="display: none;"></video>
+            <div class="camera-icon" id="start-camera-2">&#x1F4F7; Scan</div>
+            <video id="qr-reader-2" style="width: 500px; display: none;"></video>
             <div class="output" id="qr-reader-results-2">No code scanned yet</div>
         </div>
         <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-3">&#x1F4F7; Scan 4</div>
-            <video id="qr-reader-3" style="display: none;"></video>
+            <div class="camera-icon" id="start-camera-3">&#x1F4F7; Scan</div>
+            <video id="qr-reader-3" style="width: 500px; display: none;"></video>
             <div class="output" id="qr-reader-results-3">No code scanned yet</div>
         </div>
         <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-4">&#x1F4F7; Scan 5</div>
-            <video id="qr-reader-4" style="display: none;"></video>
+            <div class="camera-icon" id="start-camera-4">&#x1F4F7; Scan</div>
+            <video id="qr-reader-4" style="width: 500px; display: none;"></video>
             <div class="output" id="qr-reader-results-4">No code scanned yet</div>
         </div>
         <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-5">&#x1F4F7; Scan 6</div>
-            <video id="qr-reader-5" style="display: none;"></video>
+            <div class="camera-icon" id="start-camera-5">&#x1F4F7; Scan</div>
+            <video id="qr-reader-5" style="width: 500px; display: none;"></video>
             <div class="output" id="qr-reader-results-5">No code scanned yet</div>
         </div>
     </div>
-    
     <button id="submit" disabled>Submit</button>
     <footer>This website was developed by Yarin Waizman</footer>
-    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            if (!window.Quagga) {
+                console.error('QuaggaJS library not loaded!');
+                return;
+            }
+
             const submitButton = document.getElementById('submit');
             const vehicleNumberInput = document.getElementById('vehicle-number');
             let scannedCodes = Array(6).fill('');
@@ -114,40 +143,54 @@
                 console.log(`QR Code Scanned: ${decodedText}`);
                 document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
                 scannedCodes[index] = decodedText;
-                submitButton.disabled = !scannedCodes.some(code => code);
+                submitButton.disabled = false;
             }
 
             function createScanner(index) {
-                Quagga.init({
-                    inputStream: {
-                        name: "Live",
-                        type: "LiveStream",
-                        target: document.getElementById(`qr-reader-${index}`),
-                        constraints: {
-                            facingMode: "environment" // or "user"
-                        }
-                    },
-                    decoder: {
-                        readers: ["code_39_reader", "ean_reader", "upc_reader", "code_128_reader", "qr_reader"] // Ensure QR reader is included
-                    }
-                }, function(err) {
-                    if (err) {
-                        console.error('Could not initialize scanner:', err);
-                        return;
-                    }
-                    Quagga.start();
-                    document.getElementById(`qr-reader-${index}`).style.display = "block"; // Show the video element
-                });
+                const qrReader = document.getElementById(`qr-reader-${index}`);
 
-                Quagga.onDetected(function(result) {
-                    onScanSuccess(result.codeResult.code, index);
+                // Add event listener to the "Scan" button to start scanning
+                document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
+                    // Show the video element
+                    qrReader.style.display = 'block';
+
+                    // Initialize the scanner when the button is clicked
+                    Quagga.init({
+                        inputStream: {
+                            name: "Live",
+                            type: "LiveStream",
+                            target: qrReader, // Reference to the video element
+                            constraints: {
+                                facingMode: "environment", // Use the back camera
+                                width: { ideal: 1280 }, // Adjust as necessary
+                                height: { ideal: 720 } // Adjust as necessary
+                            }
+                        },
+                        decoder: {
+                            readers: [
+                                "code_128_reader",
+                                "ean_reader",
+                                "ean_8_reader",
+                                "code_39_reader",
+                                "upc_reader"
+                            ]
+                        }
+                    }, (err) => {
+                        if (err) {
+                            console.error('Could not initialize Quagga:', err);
+                            return;
+                        }
+                        console.log(`Quagga initialized for scanner ${index}`);
+                        Quagga.start(); // Start the scanner
+                        Quagga.onDetected((data) => {
+                            onScanSuccess(data.codeResult.code, index);
+                        });
+                    });
                 });
             }
 
             for (let i = 0; i < 6; i++) {
-                document.getElementById(`start-camera-${i}`).addEventListener('click', () => {
-                    createScanner(i);
-                });
+                createScanner(i);
             }
 
             submitButton.addEventListener('click', () => {

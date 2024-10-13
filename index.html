@@ -231,7 +231,7 @@ footer {
             if (scannedCodes.length > 0 && vehicleNumber) {
                 // Send scanned codes and vehicle number to the backend
                 console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
-                fetch('http://localhost:5000/submit', {
+                fetch('https://qrscanner-6dow.onrender.com/submit', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

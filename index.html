@@ -148,7 +148,7 @@
                 const html5QrCode = new Html5Qrcode(`qr-reader-${index}`);
                 const qrCodeScannerConfig = {
                     fps: 10,
-                    qrbox: { width: 250, height: 250 }, // Ensure this is not too large
+                    qrbox: { width: 300, height: 300 }, // Ensure this is not too large
                 };
                 document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
                     console.log(`Starting camera ${index}...`);

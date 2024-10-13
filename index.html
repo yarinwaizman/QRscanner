@@ -156,7 +156,9 @@
                     
                     codeReader.getVideoInputDevices()
                         .then((videoInputDevices) => {
-                            const firstDeviceId = videoInputDevices[0].deviceId;
+                            // Filter for environment cameras
+                            const environmentDevices = videoInputDevices.filter(device => device.kind === 'videoinput' && device.label.includes('environment'));
+                            const firstDeviceId = environmentDevices.length > 0 ? environmentDevices[0].deviceId : videoInputDevices[0].deviceId;
 
                             codeReader.decodeFromVideoDevice(firstDeviceId, qrReader, (result, err) => {
                                 if (result) {
@@ -169,7 +171,7 @@
                                     document.getElementById(`qr-reader-results-${index}`).textContent = `Error: ${err}`;
                                 }
                             }, {
-                                facingMode: { exact: "environment" } // Ensure rear camera is used
+                                facingMode: "environment" // Ensure rear camera is used
                             });
                         })
                         .catch((err) => {

@@ -28,8 +28,11 @@ function startCamera(index) {
 
     navigator.mediaDevices.enumerateDevices()
         .then(devices => {
+            console.log('Devices:', devices);
             const videoDevices = devices.filter(device => device.kind === 'videoinput');
+            console.log('Video Devices:', videoDevices);
             let rearCamera = videoDevices.find(device => device.label.toLowerCase().includes('back')) || videoDevices[0];
+            console.log('Selected Camera:', rearCamera);
             const constraints = {
                 video: {
                     deviceId: { exact: rearCamera.deviceId }
@@ -46,6 +49,7 @@ function startCamera(index) {
             alert('Unable to access the rear camera. Please ensure camera permissions are enabled.');
         });
 }
+
 
 
 

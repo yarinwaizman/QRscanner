@@ -89,7 +89,7 @@
             color: #888;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
 </head>
 <body>
     <h1>Scan QR/Barcode</h1>
@@ -134,36 +134,28 @@
                 console.error('QuaggaJS library not loaded!');
                 return;
             }
-
             const submitButton = document.getElementById('submit');
             const vehicleNumberInput = document.getElementById('vehicle-number');
             let scannedCodes = Array(6).fill('');
-
             function onScanSuccess(decodedText, index) {
                 console.log(`QR Code Scanned: ${decodedText}`);
                 document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
                 scannedCodes[index] = decodedText;
                 submitButton.disabled = false;
             }
-
             function createScanner(index) {
                 const qrReader = document.getElementById(`qr-reader-${index}`);
-
-                // Add event listener to the "Scan" button to start scanning
                 document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
-                    // Show the video element
                     qrReader.style.display = 'block';
-
-                    // Initialize the scanner when the button is clicked
                     Quagga.init({
                         inputStream: {
                             name: "Live",
                             type: "LiveStream",
-                            target: qrReader, // Reference to the video element
+                            target: qrReader,
                             constraints: {
-                                facingMode: "environment", // Use the back camera
-                                width: { ideal: 1280 }, // Adjust as necessary
-                                height: { ideal: 720 } // Adjust as necessary
+                                facingMode: "environment",
+                                width: { ideal: 1280 },
+                                height: { ideal: 720 }
                             }
                         },
                         decoder: {
@@ -181,18 +173,16 @@
                             return;
                         }
                         console.log(`Quagga initialized for scanner ${index}`);
-                        Quagga.start(); // Start the scanner
+                        Quagga.start();
                         Quagga.onDetected((data) => {
                             onScanSuccess(data.codeResult.code, index);
                         });
                     });
                 });
             }
-
             for (let i = 0; i < 6; i++) {
                 createScanner(i);
             }
-
             submitButton.addEventListener('click', () => {
                 const vehicleNumber = vehicleNumberInput.value;
                 if (scannedCodes.some(code => code) && vehicleNumber) {
@@ -213,7 +203,6 @@
                     console.log("No scanned codes or vehicle number to submit.");
                 }
             });
-
             console.log('DOM fully loaded and parsed');
         });
     </script>

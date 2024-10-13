@@ -23,19 +23,10 @@ Quagga.onDetected(function(result) {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const videoElements = [document.getElementById('video-1')];
-    const startCameraButtons = [document.getElementById('start-camera-1')];
-    const switchCameraButtons = [document.getElementById('switch-camera-1')];
-
-    let currentCameraIndex = 0;
-
-    startCameraButtons.forEach((button, index) => {
-        button.addEventListener('click', () => startCamera(index));
-    });
-
-    switchCameraButtons.forEach((button, index) => {
-        button.addEventListener('click', () => switchCamera(index));
-    });
+    const videoElement = document.getElementById('video');
+    const startCameraButton = document.getElementById('start-camera');
+    
+    startCameraButton.addEventListener('click', startRearCamera);
 
     function stopExistingVideo(videoElement) {
         if (videoElement.srcObject) {
@@ -45,46 +36,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function startCamera(index) {
-        stopExistingVideo(videoElements[index]);
+    function startRearCamera() {
+        stopExistingVideo(videoElement);
 
         navigator.mediaDevices.enumerateDevices()
             .then(devices => {
                 const videoDevices = devices.filter(device => device.kind === 'videoinput');
-                currentCameraIndex = 0;
-                if (videoDevices.length > 0) {
-                    startSelectedCamera(index, videoDevices[currentCameraIndex]);
-                }
+                const rearCamera = videoDevices.find(device => device.label.toLowerCase().includes('back')) || videoDevices[0];
+                const constraints = {
+                    video: { deviceId: rearCamera.deviceId ? { exact: rearCamera.deviceId } : undefined, facingMode: 'environment' }
+                };
+                return navigator.mediaDevices.getUserMedia(constraints);
             })
-            .catch(err => console.error('Error enumerating devices:', err));
-    }
-
-    function startSelectedCamera(index, device) {
-        const constraints = {
-            video: {
-                deviceId: { exact: device.deviceId }
-            }
-        };
-        navigator.mediaDevices.getUserMedia(constraints)
             .then(stream => {
-                videoElements[index].srcObject = stream;
-                videoElements[index].play();
+                videoElement.srcObject = stream;
+                videoElement.play();
             })
-            .catch(err => console.error('Error accessing camera:', err));
-    }
-
-    function switchCamera(index) {
-        stopExistingVideo(videoElements[index]);
-
-        navigator.mediaDevices.enumerateDevices()
-            .then(devices => {
-                const videoDevices = devices.filter(device => device.kind === 'videoinput');
-                currentCameraIndex = (currentCameraIndex + 1) % videoDevices.length;
-                startSelectedCamera(index, videoDevices[currentCameraIndex]);
-            })
-            .catch(err => console.error('Error enumerating devices:', err));
+            .catch(err => {
+                console.error('Error accessing camera:', err);
+                alert('Unable to access the rear camera. Please ensure camera permissions are enabled.');
+            });
     }
 });
+
 
 
 

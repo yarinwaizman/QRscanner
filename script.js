@@ -5,7 +5,7 @@ Quagga.onDetected(function(result) {
     document.getElementById('scanned-result').textContent = scannedCode;
     
     // Send the scanned code to the backend for storage
-    fetch('http://localhost:5000/submit', {
+    fetch('https://qrscanner-6dow.onrender.com', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

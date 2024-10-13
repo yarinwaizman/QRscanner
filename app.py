@@ -7,8 +7,8 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)  # Enable CORS for your Flask app
 
-# Use environment variable for Excel file path
-EXCEL_FILE_PATH = os.getenv('EXCEL_FILE_PATH', '/app/data.xlsx')
+# Use a writable directory for the Excel file path
+EXCEL_FILE_PATH = os.getenv('EXCEL_FILE_PATH', '/tmp/data.xlsx')
 print(f"Using Excel file path: {EXCEL_FILE_PATH}")
 
 # Ensure the directory exists

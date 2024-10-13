@@ -23,27 +23,18 @@ Quagga.onDetected(function(result) {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const cameraSelect = document.getElementById('camera-select');
-    const startCameraButtons = [document.getElementById('start-camera-1')];
     const videoElements = [document.getElementById('video-1')];
+    const startCameraButtons = [document.getElementById('start-camera-1')];
+    const switchCameraButtons = [document.getElementById('switch-camera-1')];
 
-    // Populate the dropdown with available cameras
-    navigator.mediaDevices.enumerateDevices()
-        .then(devices => {
-            const videoDevices = devices.filter(device => device.kind === 'videoinput');
-            videoDevices.forEach(device => {
-                const option = document.createElement('option');
-                option.value = device.deviceId;
-                option.text = device.label || `Camera ${cameraSelect.length + 1}`;
-                cameraSelect.appendChild(option);
-            });
-        })
-        .catch(err => console.error('Error enumerating devices:', err));
+    let currentCameraIndex = 0;
 
-    // Start the selected camera
-    cameraSelect.addEventListener('change', () => {
-        const selectedDeviceId = cameraSelect.value;
-        startCamera(0, selectedDeviceId);
+    startCameraButtons.forEach((button, index) => {
+        button.addEventListener('click', () => startCamera(index));
+    });
+
+    switchCameraButtons.forEach((button, index) => {
+        button.addEventListener('click', () => switchCamera(index));
     });
 
     function stopExistingVideo(videoElement) {
@@ -54,24 +45,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function startCamera(index, deviceId) {
+    function startCamera(index) {
         stopExistingVideo(videoElements[index]);
 
-        videoElements[index].style.display = 'block';
-        startCameraButtons[index].style.display = 'none';
+        navigator.mediaDevices.enumerateDevices()
+            .then(devices => {
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                currentCameraIndex = 0;
+                if (videoDevices.length > 0) {
+                    startSelectedCamera(index, videoDevices[currentCameraIndex]);
+                }
+            })
+            .catch(err => console.error('Error enumerating devices:', err));
+    }
 
+    function startSelectedCamera(index, device) {
         const constraints = {
-            video: { deviceId: { exact: deviceId } }
+            video: {
+                deviceId: { exact: device.deviceId }
+            }
         };
         navigator.mediaDevices.getUserMedia(constraints)
             .then(stream => {
                 videoElements[index].srcObject = stream;
                 videoElements[index].play();
             })
-            .catch(err => {
-                console.error('Error accessing camera:', err);
-                alert('Unable to access the selected camera. Please ensure camera permissions are enabled.');
-            });
+            .catch(err => console.error('Error accessing camera:', err));
+    }
+
+    function switchCamera(index) {
+        stopExistingVideo(videoElements[index]);
+
+        navigator.mediaDevices.enumerateDevices()
+            .then(devices => {
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                currentCameraIndex = (currentCameraIndex + 1) % videoDevices.length;
+                startSelectedCamera(index, videoDevices[currentCameraIndex]);
+            })
+            .catch(err => console.error('Error enumerating devices:', err));
     }
 });
 

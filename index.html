@@ -68,6 +68,12 @@
             text-align: left;
             max-width: 300px;
         }
+        video {
+            width: 300px; /* Updated width */
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
         button {
             display: block;
             margin: 20px auto;
@@ -97,32 +103,32 @@
     <div id="scanners">
         <div class="scanner-container">
             <div class="camera-icon" id="start-camera-0">&#x1F4F7; Scan</div>
-            <video id="qr-reader-0" style="width: 500px; display: none;"></video>
+            <video id="qr-reader-0" style="display: none;"></video>
             <div class="output" id="qr-reader-results-0">No code scanned yet</div>
         </div>
         <div class="scanner-container">
             <div class="camera-icon" id="start-camera-1">&#x1F4F7; Scan</div>
-            <video id="qr-reader-1" style="width: 500px; display: none;"></video>
+            <video id="qr-reader-1" style="display: none;"></video>
             <div class="output" id="qr-reader-results-1">No code scanned yet</div>
         </div>
         <div class="scanner-container">
             <div class="camera-icon" id="start-camera-2">&#x1F4F7; Scan</div>
-            <video id="qr-reader-2" style="width: 500px; display: none;"></video>
+            <video id="qr-reader-2" style="display: none;"></video>
             <div class="output" id="qr-reader-results-2">No code scanned yet</div>
         </div>
         <div class="scanner-container">
             <div class="camera-icon" id="start-camera-3">&#x1F4F7; Scan</div>
-            <video id="qr-reader-3" style="width: 500px; display: none;"></video>
+            <video id="qr-reader-3" style="display: none;"></video>
             <div class="output" id="qr-reader-results-3">No code scanned yet</div>
         </div>
         <div class="scanner-container">
             <div class="camera-icon" id="start-camera-4">&#x1F4F7; Scan</div>
-            <video id="qr-reader-4" style="width: 500px; display: none;"></video>
+            <video id="qr-reader-4" style="display: none;"></video>
             <div class="output" id="qr-reader-results-4">No code scanned yet</div>
         </div>
         <div class="scanner-container">
             <div class="camera-icon" id="start-camera-5">&#x1F4F7; Scan</div>
-            <video id="qr-reader-5" style="width: 500px; display: none;"></video>
+            <video id="qr-reader-5" style="display: none;"></video>
             <div class="output" id="qr-reader-results-5">No code scanned yet</div>
         </div>
     </div>
@@ -162,6 +168,8 @@
                                     console.error(err);
                                     document.getElementById(`qr-reader-results-${index}`).textContent = `Error: ${err}`;
                                 }
+                            }, {
+                                facingMode: { exact: "environment" } // Ensure rear camera is used
                             });
                         })
                         .catch((err) => {

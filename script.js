@@ -7,13 +7,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to handle successful scan
     function onScanSuccess(decodedText, index) {
-        console.log(`Code matched = ${decodedText}`);
-        document.getElementById(`output-${index}`).innerText = decodedText;
-        scannedCodes[index] = decodedText;
-        if (scannedCodes.some(code => code)) {
-            submitButton.disabled = false;
+        console.log(`QR Code Scanned: ${decodedText}, at scanner index: ${index}`);
+        
+        // Check if the result container for this index exists
+        const resultContainer = document.getElementById(`qr-reader-results-${index}`);
+        if (resultContainer) {
+            resultContainer.innerText = `Scanned Code: ${decodedText}`;
+            scannedCodes[index] = decodedText;
+            console.log(`Result updated for scanner ${index}`);
+        } else {
+            console.error(`Result container for scanner ${index} not found`);
         }
+    
+        submitButton.disabled = false;
     }
+    
 
     // Function to handle scanning error
     function onScanError(errorMessage) {
@@ -44,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Ensure qrbox is not larger than container
             const qrCodeScannerConfig = {
                 fps: 10,
+              
                 
             };
     

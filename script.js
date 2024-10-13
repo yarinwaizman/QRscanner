@@ -1,9 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const resultContainer = document.getElementById('qr-reader-results');
     const submitButton = document.getElementById('submit');
+    const vehicleNumberInput = document.createElement('input');  // Add this input in your HTML if necessary
     const startCameraButton = document.getElementById('start-camera');
-    let vehicleNumberInput = document.createElement('input');  // Add this input if needed in your HTML
-
     let scannedCodes = [];
 
     function onScanSuccess(decodedText, decodedResult) {
@@ -11,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
         resultContainer.innerText = `Scanned Code: ${decodedText}`;
 
         scannedCodes.push(decodedText);
-
         submitButton.disabled = false;
     }
 
@@ -26,12 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     startCameraButton.addEventListener('click', () => {
+        console.log('Starting camera...');
         html5QrCode.start(
             { facingMode: "environment" },
             qrCodeScannerConfig,
             onScanSuccess,
             onScanError
-        ).catch(err => {
+        ).then(() => {
+            console.log('Camera started');
+        }).catch(err => {
             console.error(`Unable to start QR code scanner: ${err}`);
         });
     });
@@ -58,4 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("No scanned codes or vehicle number to submit.");
         }
     });
+
+    console.log('DOM fully loaded and parsed');
 });

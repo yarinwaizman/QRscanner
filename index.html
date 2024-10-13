@@ -94,16 +94,105 @@
     <h1>Scan QR/Barcode</h1>
     <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter vehicle number">
     <div id="scanners">
+        <!-- Six Scanner containers -->
         <div class="scanner-container">
             <div class="camera-icon" id="start-camera-0">&#x1F4F7; Scan</div>
             <div id="qr-reader-0" style="width: 500px; display: none;"></div>
             <div class="output" id="qr-reader-results-0">No code scanned yet</div>
         </div>
-        <!-- Repeat for other scanners as needed -->
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-1">&#x1F4F7; Scan</div>
+            <div id="qr-reader-1" style="width: 500px; display: none;"></div>
+            <div class="output" id="qr-reader-results-1">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-2">&#x1F4F7; Scan</div>
+            <div id="qr-reader-2" style="width: 500px; display: none;"></div>
+            <div class="output" id="qr-reader-results-2">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-3">&#x1F4F7; Scan</div>
+            <div id="qr-reader-3" style="width: 500px; display: none;"></div>
+            <div class="output" id="qr-reader-results-3">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-4">&#x1F4F7; Scan</div>
+            <div id="qr-reader-4" style="width: 500px; display: none;"></div>
+            <div class="output" id="qr-reader-results-4">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-5">&#x1F4F7; Scan</div>
+            <div id="qr-reader-5" style="width: 500px; display: none;"></div>
+            <div class="output" id="qr-reader-results-5">No code scanned yet</div>
+        </div>
     </div>
     <button id="submit" disabled>Submit</button>
     <footer>This website was developed by Yarin Waizman</footer>
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
-    <script src="scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const submitButton = document.getElementById('submit');
+            const vehicleNumberInput = document.getElementById('vehicle-number');
+            let scannedCodes = Array(6).fill('');
+            function onScanSuccess(decodedText, index) {
+                console.log(`QR Code Scanned: ${decodedText}`);
+                document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
+                scannedCodes[index] = decodedText;
+                submitButton.disabled = false;
+            }
+            function onScanError(errorMessage) {
+                console.log(`Error scanning QR Code: ${errorMessage}`);
+            }
+            function createScanner(index) {
+                const qrReader = document.getElementById(`qr-reader-${index}`);
+                const html5QrCode = new Html5Qrcode(`qr-reader-${index}`);
+                const qrCodeScannerConfig = {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }, // Ensure this is not too large
+                };
+                document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
+                    console.log(`Starting camera ${index}...`);
+                    qrReader.style.display = 'block';
+                    html5QrCode.start(
+                        { facingMode: "environment" },
+                        qrCodeScannerConfig,
+                        (decodedText) => onScanSuccess(decodedText, index),
+                        onScanError
+                    ).then(() => {
+                        console.log(`Camera ${index} started`);
+                    }).catch(err => {
+                        console.error(`Unable to start QR code scanner ${index}: ${err}`);
+                        alert(`Error starting camera ${index}: ${err}`);
+                    });
+                });
+            }
+            for (let i = 0; i < 6; i++) {
+                createScanner(i);
+            }
+            submitButton.addEventListener('click', () => {
+                const vehicleNumber = vehicleNumberInput.value;
+                if (scannedCodes.some(code => code) && vehicleNumber) {
+                    console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
+                    fetch('https://qrscanner-6dow.onrender.com/submit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        alert("Data saved successfully!");
+                        location.reload();
+                    })
+                    .catch(error => console.error('Error:', error));
+                } else {
+                    console.log("No scanned codes or vehicle number to submit.");
+                }
+            });
+            console.log('DOM fully loaded and parsed');
+        });
+    </script>
 </body>
 </html>

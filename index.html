@@ -6,93 +6,59 @@
     <title>QR/Barcode Scanner</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-            text-align: center;
-            padding: 20px;
-        }
-        h1 {
-            color: #2c3e50;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-        }
-        .license-plate {
-            display: block;
-            margin-bottom: 20px;
-            width: 300px;
-            height: 70px;
-            font-size: 36px;
-            text-align: center;
-            background-color: #FFD700;
-            border: 2px solid #333;
-            border-radius: 5px;
-            color: #000;
-            letter-spacing: 4px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 10px 0;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-        .scanner-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 10px;
-            width: 80%;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .camera-icon {
-            font-size: 16px;
-            cursor: pointer;
-            margin-right: 10px;
-            display: inline-block;
-            padding: 5px 10px;
-            background-color: #3498db;
-            color: white;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        .camera-icon:hover {
-            background-color: #2980b9;
-        }
-        .output {
-            flex: 1;
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #fff;
-            font-size: 14px;
-            text-align: left;
-            max-width: 300px;
+            padding: 20px;
+            background-color: #f8f8f8;
         }
+
+        h1 {
+            text-align: center;
+        }
+
+        #scanners {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .scanner-container {
+            margin: 10px;
+        }
+
+        video {
+            width: 320px; /* Set a reasonable width */
+            height: auto; /* Maintain aspect ratio */
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            display: none; /* Hide video by default */
+        }
+
+        .output {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
         button {
-            display: block;
-            margin: 20px auto;
-            width: 200px;
             padding: 10px 20px;
             font-size: 16px;
-            border-radius: 5px;
-            background-color: #3498db;
+            background-color: #007BFF;
             color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
         }
-        button:hover {
-            background-color: #2980b9;
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
+
         footer {
+            text-align: center;
             margin-top: 20px;
-            font-size: 14px;
-            color: #888;
-        }
-        video {
-            width: 300px; /* Adjust width */
-            height: auto; /* Maintain aspect ratio */
-            display: block; /* Ensure it occupies space */
-            margin: 0 auto; /* Center video */
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
@@ -159,16 +125,10 @@
                         target: document.getElementById(`qr-reader-${index}`),
                         constraints: {
                             facingMode: "environment" // or "user"
-                        },
-                        area: { // defines rectangle of the detection/localization area
-                            top: "0%",    // top offset
-                            right: "0%",  // right offset
-                            left: "0%",   // left offset
-                            bottom: "0%"   // bottom offset
                         }
                     },
                     decoder: {
-                        readers: ["code_39_reader", "ean_reader", "upc_reader", "code_128_reader", "qr_reader"] // Added QR reader
+                        readers: ["code_39_reader", "ean_reader", "upc_reader", "code_128_reader", "qr_reader"] // Ensure QR reader is included
                     }
                 }, function(err) {
                     if (err) {

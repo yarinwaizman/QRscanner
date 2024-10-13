@@ -69,7 +69,7 @@
             max-width: 300px;
         }
         video {
-            width: 300px; /* Updated width */
+            width: 300px; 
             height: auto;
             border: 1px solid #ddd;
             border-radius: 5px;
@@ -116,21 +116,6 @@
             <video id="qr-reader-2" style="display: none;"></video>
             <div class="output" id="qr-reader-results-2">No code scanned yet</div>
         </div>
-        <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-3">&#x1F4F7; Scan</div>
-            <video id="qr-reader-3" style="display: none;"></video>
-            <div class="output" id="qr-reader-results-3">No code scanned yet</div>
-        </div>
-        <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-4">&#x1F4F7; Scan</div>
-            <video id="qr-reader-4" style="display: none;"></video>
-            <div class="output" id="qr-reader-results-4">No code scanned yet</div>
-        </div>
-        <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-5">&#x1F4F7; Scan</div>
-            <video id="qr-reader-5" style="display: none;"></video>
-            <div class="output" id="qr-reader-results-5">No code scanned yet</div>
-        </div>
     </div>
     <button id="submit" disabled>Submit</button>
     <footer>This website was developed by Yarin Waizman</footer>
@@ -138,32 +123,34 @@
         document.addEventListener('DOMContentLoaded', () => {
             const submitButton = document.getElementById('submit');
             const vehicleNumberInput = document.getElementById('vehicle-number');
-            let scannedCodes = Array(6).fill('');
+            let scannedCodes = Array(3).fill('');
 
             function onScanSuccess(decodedText, index) {
                 console.log(`QR Code Scanned: ${decodedText}`);
                 document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
                 scannedCodes[index] = decodedText;
                 submitButton.disabled = false;
+
+                // Hide the video element after scanning
+                document.getElementById(`qr-reader-${index}`).style.display = 'none';
             }
 
             function createScanner(index) {
                 const qrReader = document.getElementById(`qr-reader-${index}`);
                 document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
-                    qrReader.style.display = 'block';
+                    qrReader.style.display = 'block'; // Show the camera when the scan starts
                     const codeReader = new ZXing.BrowserQRCodeReader();
                     console.log('QR code reader initialized');
 
                     codeReader.getVideoInputDevices()
                         .then((videoInputDevices) => {
-                            console.log('Available video input devices:', videoInputDevices); // Log available devices
+                            console.log('Available video input devices:', videoInputDevices);
                             
-                            // Attempt to select the rear camera based on its facing mode
                             const rearCamera = videoInputDevices.find(device => device.label.toLowerCase().includes('back')) || 
                                                 videoInputDevices.find(device => device.label.toLowerCase().includes('environment')) || 
-                                                videoInputDevices[0]; // Fallback to the first available device
+                                                videoInputDevices[0];
 
-                            console.log('Using camera:', rearCamera); // Log which camera is being used
+                            console.log('Using camera:', rearCamera);
                             
                             codeReader.decodeFromVideoDevice(rearCamera.deviceId, qrReader, (result, err) => {
                                 if (result) {
@@ -176,7 +163,7 @@
                                     document.getElementById(`qr-reader-results-${index}`).textContent = `Error: ${err}`;
                                 }
                             }, {
-                                facingMode: { exact: "environment" } // Ensure rear camera is used
+                                facingMode: { exact: "environment" }
                             });
                         })
                         .catch((err) => {
@@ -186,7 +173,7 @@
                 });
             }
 
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 3; i++) {
                 createScanner(i);
             }
 

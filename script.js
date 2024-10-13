@@ -3,13 +3,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitButton = document.getElementById('submit');
     const vehicleNumberInput = document.getElementById('vehicle-number');
 
+    let scannedCodes = [];
+
     function onScanSuccess(decodedText, decodedResult) {
         // Display the scanned result on the page
         console.log(`Code matched = ${decodedText}`, decodedResult);
         resultContainer.innerText = `Scanned Code: ${decodedText}`;
 
-        // Prepare data for submission
-        scannedCodes = [decodedText];
+        // Store scanned codes
+        scannedCodes.push(decodedText);
 
         // Enable submit button
         submitButton.disabled = false;

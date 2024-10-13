@@ -33,30 +33,22 @@
             margin-right: auto;
             padding: 10px 0;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            background-image: linear-gradient(90deg, #FFD700, #FFD700 90%, #0000FF 90%, #0000FF);
         }
         .scanner-container {
             display: flex;
-            justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
-        }
-        .output {
-            width: 300px;
-            height: 40px;
-            padding: 10px;
-            margin-right: 10px;
-            text-align: center;
-            border: 1px solid #333;
-            border-radius: 5px;
-            background-color: #fff;
-            font-size: 16px;
-            line-height: 40px;
+            justify-content: center;
+            margin-bottom: 10px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
         }
         .camera-icon {
-            font-size: 24px;
+            font-size: 16px;
             cursor: pointer;
-            padding: 10px;
+            margin-right: 10px;
+            display: inline-block;
+            padding: 5px 10px;
             background-color: #3498db;
             color: white;
             border-radius: 5px;
@@ -65,11 +57,23 @@
         .camera-icon:hover {
             background-color: #2980b9;
         }
+        .output {
+            flex: 1;
+            margin: 0;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            font-size: 14px;
+            text-align: left;
+            max-width: 300px;
+        }
         .video-container {
             display: none;
             width: 100%;
-            max-width: 500px;
-            margin: 10px auto;
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 20px;
             border: 2px solid #333;
             border-radius: 10px;
         }
@@ -98,27 +102,94 @@
 <body>
     <h1>Scan QR/Barcode</h1>
     <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter vehicle number">
-    <div id="scanners"></div>
-    <div id="qr-reader-results-1"></div>
-    <div id="qr-reader-results-2"></div>
-    <div id="qr-reader-results-3"></div>
-    <div id="qr-reader-results-4"></div>
-    <div id="qr-reader-results-5"></div>
-    <div id="qr-reader-results-6"></div>
-    <!-- And so on for other scanners -->
-    
-    <!-- And so on for other scanners -->
-    
-    <!-- And so on for other scanners -->
-    
+    <div id="scanners">
+        <!-- Scanner containers will be generated here -->
+    </div>
     <button id="submit" disabled>Submit</button>
     <footer>This website was developed by Yarin Waizman</footer>
-    
-    <!-- Include the Html5Qrcode library -->
-    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const scannersContainer = document.getElementById('scanners');
+            const submitButton = document.getElementById('submit');
+            const vehicleNumberInput = document.getElementById('vehicle-number');
 
-    
-    <!-- Link to your custom JavaScript file -->
-    <script src="script.js"></script>
+            let scannedCodes = Array(6).fill('');
+
+            function onScanSuccess(decodedText, index) {
+                console.log(`QR Code Scanned: ${decodedText}`);
+                document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
+                scannedCodes[index] = decodedText;
+                submitButton.disabled = false;
+            }
+
+            function onScanError(errorMessage) {
+                console.log(`Error scanning QR Code: ${errorMessage}`);
+            }
+
+            function createScanner(index) {
+                const container = document.createElement('div');
+                container.className = 'scanner-container';
+                container.innerHTML = `
+                    <div class="camera-icon" id="start-camera-${index}">&#x1F4F7; Scan</div>
+                    <div id="qr-reader-${index}" style="width: 500px; display: none;"></div>
+                    <div class="output" id="qr-reader-results-${index}">No code scanned yet</div>
+                `;
+                scannersContainer.appendChild(container);
+
+                const startCameraButton = document.getElementById(`start-camera-${index}`);
+                const qrReader = document.getElementById(`qr-reader-${index}`);
+                const html5QrCode = new Html5Qrcode(`qr-reader-${index}`);
+                const qrCodeScannerConfig = {
+                    fps: 10,
+                    qrbox: 250
+                };
+
+                startCameraButton.addEventListener('click', () => {
+                    console.log(`Starting camera ${index}...`);
+                    qrReader.style.display = 'block';
+                    html5QrCode.start(
+                        { facingMode: "environment" },
+                        qrCodeScannerConfig,
+                        (decodedText) => onScanSuccess(decodedText, index),
+                        onScanError
+                    ).then(() => {
+                        console.log(`Camera ${index} started`);
+                    }).catch(err => {
+                        console.error(`Unable to start QR code scanner ${index}: ${err}`);
+                    });
+                });
+            }
+
+            for (let i = 0; i < 6; i++) {
+                createScanner(i);
+            }
+
+            submitButton.addEventListener('click', () => {
+                const vehicleNumber = vehicleNumberInput.value;
+                if (scannedCodes.some(code => code) && vehicleNumber) {
+                    console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
+                    fetch('https://qrscanner-6dow.onrender.com/submit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        alert("Data saved successfully!");
+                        location.reload();
+                    })
+                    .catch(error => console.error('Error:', error));
+                } else {
+                    console.log("No scanned codes or vehicle number to submit.");
+                }
+            });
+
+            console.log('DOM fully loaded and parsed');
+        });
+    </script>
 </body>
 </html>

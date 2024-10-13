@@ -25,22 +25,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.createElement('div');
         container.className = 'scanner-container';
         container.innerHTML = `
-            <div id="output-${index}" class="output">No code scanned</div>
             <div class="camera-icon" id="start-camera-${index}">&#x1F4F7; Scan</div>
-            <div id="qr-reader-${index}" class="video-container"></div>
+            <div id="qr-reader-${index}" style="width:100%; max-width:500px; display:none;"></div>
+            <div id="qr-reader-results-${index}"></div>
         `;
         scannersContainer.appendChild(container);
-
+    
         const startCameraButton = document.getElementById(`start-camera-${index}`);
         const qrReader = document.getElementById(`qr-reader-${index}`);
         const html5QrCode = new Html5Qrcode(`qr-reader-${index}`);
+        
+        // Calculate appropriate qrbox size based on container width
+        const containerWidth = qrReader.offsetWidth;
         const qrCodeScannerConfig = {
             fps: 10,
-            qrbox: 250
+            qrbox: containerWidth < 300 ? containerWidth * 0.8 : 250  // Adjust size dynamically
         };
-
+    
         startCameraButton.addEventListener('click', () => {
-            console.log(`Starting camera for scanner ${index}...`);
+            console.log(`Starting camera ${index}...`);
             qrReader.style.display = 'block';
             html5QrCode.start(
                 { facingMode: "environment" },
@@ -48,12 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 (decodedText) => onScanSuccess(decodedText, index),
                 onScanError
             ).then(() => {
-                console.log(`Camera for scanner ${index} started`);
+                console.log(`Camera ${index} started`);
             }).catch(err => {
                 console.error(`Unable to start QR code scanner ${index}: ${err}`);
             });
         });
     }
+    
 
     // Create six scanners
     for (let i = 0; i < 6; i++) {

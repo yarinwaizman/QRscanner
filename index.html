@@ -145,27 +145,26 @@
                 document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
                 scannedCodes[index] = decodedText;
                 submitButton.disabled = false;
+                
+                // Hide the video element and reset its size
+                const qrReader = document.getElementById(`qr-reader-${index}`);
+                qrReader.style.display = 'none';
+                qrReader.style.width = '0px'; // Optionally reset width
             }
 
             function createScanner(index) {
                 const qrReader = document.getElementById(`qr-reader-${index}`);
                 document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
                     qrReader.style.display = 'block';
+                    qrReader.style.width = '300px'; // Ensure correct width when shown
                     const codeReader = new ZXing.BrowserQRCodeReader();
                     console.log('QR code reader initialized');
 
                     codeReader.getVideoInputDevices()
                         .then((videoInputDevices) => {
-                            console.log('Available video input devices:', videoInputDevices); // Log available devices
-                            
-                            // Attempt to select the rear camera based on its facing mode
-                            const rearCamera = videoInputDevices.find(device => device.label.toLowerCase().includes('back')) || 
-                                                videoInputDevices.find(device => device.label.toLowerCase().includes('environment')) || 
-                                                videoInputDevices[0]; // Fallback to the first available device
+                            const firstDeviceId = videoInputDevices[0].deviceId;
 
-                            console.log('Using camera:', rearCamera); // Log which camera is being used
-                            
-                            codeReader.decodeFromVideoDevice(rearCamera.deviceId, qrReader, (result, err) => {
+                            codeReader.decodeFromVideoDevice(firstDeviceId, qrReader, (result, err) => {
                                 if (result) {
                                     console.log(result);
                                     onScanSuccess(result.text, index);
@@ -176,7 +175,7 @@
                                     document.getElementById(`qr-reader-results-${index}`).textContent = `Error: ${err}`;
                                 }
                             }, {
-                                facingMode: { exact: "environment" } // Ensure rear camera is used
+                                facingMode: { exact: "environment" }
                             });
                         })
                         .catch((err) => {

@@ -23,6 +23,13 @@ Quagga.onDetected(function(result) {
 });
 
 function startCamera(index) {
+    // Ensure we stop any existing video stream
+    if (videoElements[index].srcObject) {
+        let tracks = videoElements[index].srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+        videoElements[index].srcObject = null;
+    }
+
     videoElements[index].style.display = 'block';
     startCameraButtons[index].style.display = 'none';
 
@@ -34,9 +41,7 @@ function startCamera(index) {
             let rearCamera = videoDevices.find(device => device.label.toLowerCase().includes('back')) || videoDevices[0];
             console.log('Selected Camera:', rearCamera);
             const constraints = {
-                video: {
-                    deviceId: { exact: rearCamera.deviceId }
-                }
+                video: { facingMode: { exact: 'environment' } } // Prefer rear camera specifically
             };
             return navigator.mediaDevices.getUserMedia(constraints);
         })
@@ -49,12 +54,6 @@ function startCamera(index) {
             alert('Unable to access the rear camera. Please ensure camera permissions are enabled.');
         });
 }
-
-
-
-
-
-
 
 const videoElements = [
     document.getElementById('video-1'),

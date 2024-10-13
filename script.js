@@ -22,41 +22,59 @@ Quagga.onDetected(function(result) {
     });
 });
 
-function stopExistingVideo(videoElement) {
-    if (videoElement.srcObject) {
-        let tracks = videoElement.srcObject.getTracks();
-        tracks.forEach(track => track.stop());
-        videoElement.srcObject = null;
-    }
-}
+document.addEventListener('DOMContentLoaded', () => {
+    const cameraSelect = document.getElementById('camera-select');
+    const startCameraButtons = [document.getElementById('start-camera-1')];
+    const videoElements = [document.getElementById('video-1')];
 
-function startCamera(index) {
-    stopExistingVideo(videoElements[index]);
-
-    videoElements[index].style.display = 'block';
-    startCameraButtons[index].style.display = 'none';
-
+    // Populate the dropdown with available cameras
     navigator.mediaDevices.enumerateDevices()
         .then(devices => {
-            console.log('Devices:', devices);
             const videoDevices = devices.filter(device => device.kind === 'videoinput');
-            console.log('Video Devices:', videoDevices);
-            let rearCamera = videoDevices.find(device => device.label.toLowerCase().includes('back')) || videoDevices[0];
-            console.log('Selected Camera:', rearCamera);
-            const constraints = {
-                video: { deviceId: { exact: rearCamera.deviceId } }
-            };
-            return navigator.mediaDevices.getUserMedia(constraints);
+            videoDevices.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device.deviceId;
+                option.text = device.label || `Camera ${cameraSelect.length + 1}`;
+                cameraSelect.appendChild(option);
+            });
         })
-        .then(stream => {
-            videoElements[index].srcObject = stream;
-            videoElements[index].play();
-        })
-        .catch(err => {
-            console.error('Error accessing camera:', err);
-            alert('Unable to access the rear camera. Please ensure camera permissions are enabled.');
-        });
-}
+        .catch(err => console.error('Error enumerating devices:', err));
+
+    // Start the selected camera
+    cameraSelect.addEventListener('change', () => {
+        const selectedDeviceId = cameraSelect.value;
+        startCamera(0, selectedDeviceId);
+    });
+
+    function stopExistingVideo(videoElement) {
+        if (videoElement.srcObject) {
+            let tracks = videoElement.srcObject.getTracks();
+            tracks.forEach(track => track.stop());
+            videoElement.srcObject = null;
+        }
+    }
+
+    function startCamera(index, deviceId) {
+        stopExistingVideo(videoElements[index]);
+
+        videoElements[index].style.display = 'block';
+        startCameraButtons[index].style.display = 'none';
+
+        const constraints = {
+            video: { deviceId: { exact: deviceId } }
+        };
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(stream => {
+                videoElements[index].srcObject = stream;
+                videoElements[index].play();
+            })
+            .catch(err => {
+                console.error('Error accessing camera:', err);
+                alert('Unable to access the selected camera. Please ensure camera permissions are enabled.');
+            });
+    }
+});
+
 
 
 const videoElements = [

@@ -97,19 +97,16 @@
 </head>
 <body>
     <h1>Scan QR/Barcode</h1>
-    <!-- Input for vehicle number styled as a license plate -->
     <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter vehicle number">
-    
-    <div id="scanners">
-        <!-- Rows of scanned code boxes and camera icons will be generated here -->
-    </div>
-
+    <div id="scanners"></div>
     <button id="submit" disabled>Submit</button>
-
-    <!-- Footer message -->
     <footer>This website was developed by Yarin Waizman</footer>
+    
+    <!-- Include the Html5Qrcode library -->
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
 
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    
+    <!-- Link to your custom JavaScript file -->
     <script src="script.js"></script>
 </body>
 </html>

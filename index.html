@@ -148,7 +148,15 @@
 
             function createScanner(index) {
                 const qrReader = document.getElementById(`qr-reader-${index}`);
-                const scanner = new Instascan.Scanner({ video: qrReader });
+                const scanner = new Instascan.Scanner({
+    video: document.getElementById('qr-reader-0'),
+    constraints: {
+        width: 500,
+        height: 500,
+        facingMode: 'environment' // or 'user'
+    }
+});
+
 
                 scanner.addListener('scan', (content) => {
                     onScanSuccess(content, index);

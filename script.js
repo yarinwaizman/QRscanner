@@ -23,29 +23,25 @@ Quagga.onDetected(function(result) {
 });
 
 function startCamera(index) {
-    if (videoElements[index]) {
-        videoElements[index].style.display = 'block';
-        startCameraButtons[index].style.display = 'none';
-        codeReader
-            .listVideoInputDevices()
-            .then(videoInputDevices => {
-                const firstDeviceId = videoInputDevices[0].deviceId;
-                codeReader.decodeFromVideoDevice(firstDeviceId, videoElements[index].id, (result, err) => {
-                    if (result) {
-                        scannedResultElements[index].textContent = result.text;
-                        scannedCodes[index] = result.text;
-                        videoElements[index].style.display = 'none'; // Hide camera after scanning
-                        console.log(`Scanned result ${index + 1}:`, result.text);
-                    }
-                    if (err && !(err instanceof ZXing.NotFoundException)) {
-                        console.error(err);
-                    }
-                });
-            })
-            .catch(err => console.error(err));
-    } else {
-        console.error(`Video element not found for index ${index}`);
-    }
+    videoElements[index].style.display = 'block';
+    startCameraButtons[index].style.display = 'none';
+    codeReader
+        .listVideoInputDevices()
+        .then(videoInputDevices => {
+            const rearCamera = videoInputDevices.find(device => device.label.toLowerCase().includes('back')) || videoInputDevices[0];
+            codeReader.decodeFromVideoDevice(rearCamera.deviceId, videoElements[index].id, (result, err) => {
+                if (result) {
+                    scannedResultElements[index].textContent = result.text;
+                    scannedCodes[index] = result.text;
+                    videoElements[index].style.display = 'none'; // Hide camera after scanning
+                    console.log(`Scanned result ${index + 1}:`, result.text);
+                }
+                if (err && !(err instanceof ZXing.NotFoundException)) {
+                    console.error(err);
+                }
+            });
+        })
+        .catch(err => console.error(err));
 }
 
 
@@ -66,4 +62,27 @@ const startCameraButtons = [
     document.getElementById('start-camera-5'),
     document.getElementById('start-camera-6')
 ];
+
+submitButton.addEventListener('click', () => {
+    const vehicleNumber = vehicleNumberInput.value;
+    if (scannedCodes.length > 0 && vehicleNumber) {
+        console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
+        fetch('https://qrscanner-6dow.onrender.com/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            alert("Data saved successfully!"); // Display message box
+            location.reload(); // Reload the page
+        })
+        .catch(error => console.error('Error:', error));
+    } else {
+        console.log("No scanned codes or vehicle number to submit.");
+    }
+});
 

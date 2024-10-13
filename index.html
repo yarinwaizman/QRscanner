@@ -89,7 +89,7 @@
             color: #888;
         }
     </style>
-    <script src="instascan.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.6.5/quagga.min.js"></script>
 </head>
 <body>
     <h1>Scan QR/Barcode</h1>
@@ -129,9 +129,9 @@
     <button id="submit" disabled>Submit</button>
     <footer>This website was developed by Yarin Waizman</footer>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!window.Instascan) {
-                console.error('Instascan library not loaded!');
+       document.addEventListener('DOMContentLoaded', () => {
+            if (!window.Quagga) {
+                console.error('QuaggaJS library not loaded!');
                 return;
             }
 
@@ -139,38 +139,51 @@
             const vehicleNumberInput = document.getElementById('vehicle-number');
             let scannedCodes = Array(6).fill('');
 
-            function onScanSuccess(decodedText, index) {
+            function onScanSuccess(decodedText, result) {
                 console.log(`QR Code Scanned: ${decodedText}`);
-                document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
-                scannedCodes[index] = decodedText;
+                document.getElementById(`qr-reader-results-0`).innerText = `Scanned Code: ${decodedText}`;
+                scannedCodes[0] = decodedText;
                 submitButton.disabled = false;
             }
 
             function createScanner(index) {
                 const qrReader = document.getElementById(`qr-reader-${index}`);
-                const scanner = new Instascan.Scanner({
-    video: document.getElementById('qr-reader-0'),
-    constraints: {
-        width: 500,
-        height: 500,
-        facingMode: 'environment' // or 'user'
-    }
-});
+                const scanner = new Quagga.Scanner({
+                    locate: true,
+                    readers: {
+                        code_39: { enabled: true },
+                        code_128: { enabled: true },
+                        ean_reader: { enabled: true },
+                        upc_reader: { enabled: true }
+                    },
+                    camera: {
+                        result: document.getElementById(`qr-reader-results-${index}`),
+                        locate: true,
+                        showVideoFinder: false,
+                        disableScanner: false,
+                        playSoundOnScan: true,
+                        showMicrophoneId: false,
+                        showCameraId: false,
+                        cameraId: '0'
+                    }
+                });
 
-
-                scanner.addListener('scan', (content) => {
-                    onScanSuccess(content, index);
+                scanner.addListener('scan', (result) => {
+                    onScanSuccess(result.code, result);
                 });
 
                 document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
-                    Instascan.Camera.getCameras().then((cameras) => {
-                        if (cameras.length > 0) {
-                            scanner.start(cameras[0]); // You can select different cameras if needed
-                            qrReader.style.display = 'block';
+                    Quagga.initScanner({
+                        locator: { camera: '0' },
+                        numRetries: 3,
+                        decode: { readers: ['code_39', 'code_128', 'ean_13', 'upc'] }
+                    }, (err) => {
+                        if (err) {
+                            console.error('Could not initialize scanner:', err);
                         } else {
-                            console.error('No cameras found.');
+                            scanner.start();
                         }
-                    }).catch((e) => console.error(e));
+                    });
                 });
             }
 

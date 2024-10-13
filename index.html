@@ -95,6 +95,7 @@
     <h1>Scan QR/Barcode</h1>
     <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter vehicle number">
     <div id="scanners">
+        <!-- Six Scanner containers -->
         <div class="scanner-container">
             <div class="camera-icon" id="start-camera-0">&#x1F4F7; Scan</div>
             <div id="qr-reader-0" style="width: 500px; display: none;"></div>
@@ -153,6 +154,7 @@
                     Instascan.Camera.getCameras().then((cameras) => {
                         if (cameras.length > 0) {
                             scanner.start(cameras[0]); // You can select different cameras if needed
+                            qrReader.style.display = 'block';
                         } else {
                             console.error('No cameras found.');
                         }

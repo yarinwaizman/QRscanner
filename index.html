@@ -5,258 +5,195 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR/Barcode Scanner</title>
     <style>
-     body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f5f5f5;
-    color: #333;
-    text-align: center;
-    padding: 20px;
-}
-
-h1 {
-    color: #2c3e50;
-    font-size: 2.5em;
-    margin-bottom: 20px;
-}
-
-.license-plate {
-    display: block;
-    margin-bottom: 20px;
-    width: 300px;
-    height: 70px;
-    font-size: 36px;
-    text-align: center;
-    background-color: #FFD700; /* Golden yellow color */
-    border: 2px solid #333;
-    border-radius: 5px;
-    color: #000;
-    letter-spacing: 4px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 10px 0;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    background-image: linear-gradient(90deg, #FFD700, #FFD700 90%, #0000FF 90%, #0000FF); /* Israeli plate colors */
-}
-
-.scanner-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-    width: 80%;  
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.camera-icon {
-    font-size: 16px;
-    cursor: pointer;
-    margin-right: 10px;
-    display: inline-block;
-    padding: 5px 10px;
-    background-color: #3498db;
-    color: white;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.camera-icon:hover {
-    background-color: #2980b9;
-}
-
-.output {
-    flex: 1;
-    margin: 0;
-    padding: 5px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #fff;
-    font-size: 14px; 
-    text-align: left;
-    max-width: 300px;
-}
-
-.video-container {
-    display: none;
-    width: 100%;
-    max-width: 200px;
-    height: auto;
-    margin-bottom: 20px;
-    border: 2px solid #333;
-    border-radius: 10px;
-}
-
-button {
-    display: block;
-    margin: 20px auto;
-    width: 200px;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 5px;
-    background-color: #3498db;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background-color: #2980b9;
-}
-
-footer {
-    margin-top: 20px;
-    font-size: 14px;
-    color: #888;
-}
-
-
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        .license-plate {
+            display: block;
+            margin-bottom: 20px;
+            width: 300px;
+            height: 70px;
+            font-size: 36px;
+            text-align: center;
+            background-color: #FFD700; /* Golden yellow color */
+            border: 2px solid #333;
+            border-radius: 5px;
+            color: #000;
+            letter-spacing: 4px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 10px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            background-image: linear-gradient(90deg, #FFD700, #FFD700 90%, #0000FF 90%, #0000FF); /* Israeli plate colors */
+        }
+        .scanner-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .camera-icon {
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .camera-icon:hover {
+            background-color: #2980b9;
+        }
+        .output {
+            flex: 1;
+            margin: 0;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            font-size: 14px;
+            text-align: left;
+            max-width: 300px;
+        }
+        .video-container {
+            display: none;
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 20px;
+            border: 2px solid #333;
+            border-radius: 10px;
+        }
+        button {
+            display: block;
+            margin: 20px auto;
+            width: 200px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #888;
+        }
     </style>
 </head>
 <body>
-    
     <h1>Scan QR/Barcode</h1>
-    
     <!-- Input for vehicle number styled as a license plate -->
     <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter vehicle number">
-    
-    <div id="qr-reader" style="width:500px"></div>
-<div id="qr-reader-results"></div>
-<button id="submit" disabled>Submit</button>
-
-    
-   
-    <!-- Scanners -->
-    <div class="scanner-container">
-        <div class="camera-icon" id="start-camera">&#x1F4F7; Scan</div>
-        <div id="qr-reader" style="width:500px"></div>
-        <div id="qr-reader-results"></div>
+    <div id="scanners">
+        <!-- Scanner containers will be generated here -->
     </div>
-    <div class="scanner-container">
-        <div class="camera-icon" id="start-camera">&#x1F4F7; Scan</div>
-        <div id="qr-reader" style="width:500px"></div>
-        <div id="qr-reader-results"></div>
-    </div>
-    <div class="scanner-container">
-        <div class="camera-icon" id="start-camera">&#x1F4F7; Scan</div>
-        <div id="qr-reader" style="width:500px"></div>
-        <div id="qr-reader-results"></div>
-    </div>
-    <div class="scanner-container">
-        <div class="camera-icon" id="start-camera">&#x1F4F7; Scan</div>
-        <div id="qr-reader" style="width:500px"></div>
-        <div id="qr-reader-results"></div>
-    </div>
-    <div class="scanner-container">
-        <div class="camera-icon" id="start-camera">&#x1F4F7; Scan</div>
-        <div id="qr-reader" style="width:500px"></div>
-        <div id="qr-reader-results"></div>
-    </div>
-    <div class="scanner-container">
-        <div class="camera-icon" id="start-camera">&#x1F4F7; Scan</div>
-        <div id="qr-reader" style="width:500px"></div>
-        <div id="qr-reader-results"></div>
-    </div>
-    
-    <!-- Submit button -->
-    <button id="submit">Submit</button>
-
+    <button id="submit" disabled>Submit</button>
     <!-- Footer message -->
     <footer>This website was developed by Yarin Waizman</footer>
-    
-    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-<script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
-<script src="https://unpkg.com/opencv.js"></script>
-
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <script>
-        // Reference to elements
-        const videoElements = [
-            document.getElementById('video-1'),
-            document.getElementById('video-2'),
-            document.getElementById('video-3'),
-            document.getElementById('video-4'),
-            document.getElementById('video-5'),
-            document.getElementById('video-6')
-        ];
-    
-        const scannedResultElements = [
-            document.getElementById('scanned-result-1'),
-            document.getElementById('scanned-result-2'),
-            document.getElementById('scanned-result-3'),
-            document.getElementById('scanned-result-4'),
-            document.getElementById('scanned-result-5'),
-            document.getElementById('scanned-result-6')
-        ];
-    
-        const startCameraButtons = [
-            document.getElementById('start-camera-1'),
-            document.getElementById('start-camera-2'),
-            document.getElementById('start-camera-3'),
-            document.getElementById('start-camera-4'),
-            document.getElementById('start-camera-5'),
-            document.getElementById('start-camera-6')
-        ];
-    
-        const submitButton = document.getElementById('submit');
-        const vehicleNumberInput = document.getElementById('vehicle-number');
-    
-        // Create instance of the ZXing BarcodeReader
-        const codeReader = new ZXing.BrowserMultiFormatReader();
-    
-        const scannedCodes = Array(6).fill('');
-    
-        // Function to start the camera
-        function startCamera(index) {
-            videoElements[index].style.display = 'block';
-            startCameraButtons[index].style.display = 'none';
-            codeReader
-                .listVideoInputDevices()
-                .then(videoInputDevices => {
-                    const firstDeviceId = videoInputDevices[0].deviceId;
-                    codeReader.decodeFromVideoDevice(firstDeviceId, videoElements[index].id, (result, err) => {
-                        if (result) {
-                            scannedResultElements[index].textContent = result.text;
-                            scannedCodes[index] = result.text;
-                            videoElements[index].style.display = 'none'; // Hide camera after scanning
-                            console.log(`Scanned result ${index + 1}:`, result.text);
-                        }
-                        if (err && !(err instanceof ZXing.NotFoundException)) {
-                            console.error(err);
-                        }
-                    });
-                })
-                .catch(err => console.error(err));
-        }
-    
-        // Event listeners for the camera icons
-        startCameraButtons.forEach((button, index) => {
-            button.addEventListener('click', () => startCamera(index));
-        });
-    
-        // Event listener for the submit button
-        submitButton.addEventListener('click', () => {
-            const vehicleNumber = vehicleNumberInput.value;
-            if (scannedCodes.length > 0 && vehicleNumber) {
-                // Send scanned codes and vehicle number to the backend
-                console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
-                fetch('https://qrscanner-6dow.onrender.com/submit', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);
-                    alert("Data saved successfully!"); // Display message box
-                    location.reload(); // Reload the page
-                })
-                .catch(error => console.error('Error:', error));
-            } else {
-                console.log("No scanned codes or vehicle number to submit.");
+        document.addEventListener('DOMContentLoaded', () => {
+            const scannersContainer = document.getElementById('scanners');
+            const resultContainer = document.getElementById('qr-reader-results');
+            const submitButton = document.getElementById('submit');
+            const vehicleNumberInput = document.getElementById('vehicle-number');
+
+            let scannedCodes = Array(6).fill('');
+
+            function onScanSuccess(decodedText, index) {
+                console.log(`Code matched = ${decodedText}`);
+                document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
+                scannedCodes[index] = decodedText;
+                submitButton.disabled = false;
             }
+
+            function onScanError(errorMessage) {
+                console.log(`Error scanning QR Code: ${errorMessage}`);
+            }
+
+            function createScanner(index) {
+                const container = document.createElement('div');
+                container.className = 'scanner-container';
+                container.innerHTML = `
+                    <div class="camera-icon" id="start-camera-${index}">&#x1F4F7; Scan</div>
+                    <div id="qr-reader-${index}" style="width:500px; display:none;"></div>
+                    <div id="qr-reader-results-${index}"></div>
+                `;
+                scannersContainer.appendChild(container);
+
+                const startCameraButton = document.getElementById(`start-camera-${index}`);
+                const qrReader = document.getElementById(`qr-reader-${index}`);
+                const html5QrCode = new Html5Qrcode(`qr-reader-${index}`);
+                const qrCodeScannerConfig = {
+                    fps: 10,
+                    qrbox: 250
+                };
+
+                startCameraButton.addEventListener('click', () => {
+                    console.log(`Starting camera ${index}...`);
+                    qrReader.style.display = 'block';
+                    html5QrCode.start(
+                        { facingMode: "environment" },
+                        qrCodeScannerConfig,
+                        (decodedText) => onScanSuccess(decodedText, index),
+                        onScanError
+                    ).then(() => {
+                        console.log(`Camera ${index} started`);
+                    }).catch(err => {
+                        console.error(`Unable to start QR code scanner ${index}: ${err}`);
+                    });
+                });
+            }
+
+            for (let i = 0; i < 6; i++) {
+                createScanner(i);
+            }
+
+            submitButton.addEventListener('click', () => {
+                const vehicleNumber = vehicleNumberInput.value;
+                if (scannedCodes.some(code => code) && vehicleNumber) {
+                    console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
+                    fetch('https://qrscanner-6dow.onrender.com/submit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        alert("Data saved successfully!");
+                        location.reload();
+                    })
+                    .catch(error => console.error('Error:', error));
+                } else {
+                    console.log("No scanned codes or vehicle number to submit.");
+                }
+            });
+
+            console.log('DOM fully loaded and parsed');
         });
     </script>
-    
 </body>
 </html>

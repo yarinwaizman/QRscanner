@@ -27,7 +27,7 @@ function startCamera(index) {
     startCameraButtons[index].style.display = 'none';
     const constraints = {
         video: {
-            facingMode: 'environment' // Rear camera
+            facingMode: { exact: 'environment' } // Prefer rear camera
         }
     };
     navigator.mediaDevices.getUserMedia(constraints)
@@ -35,8 +35,18 @@ function startCamera(index) {
             videoElements[index].srcObject = stream;
             videoElements[index].play();
         })
-        .catch(err => console.error('Error accessing camera:', err));
+        .catch(err => {
+            console.error('Error accessing rear camera:', err);
+            // Fallback to the default camera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    videoElements[index].srcObject = stream;
+                    videoElements[index].play();
+                })
+                .catch(err => console.error('Error accessing camera:', err));
+        });
 }
+
 
 
 

@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify
 import pandas as pd
 from flask_cors import CORS
@@ -6,10 +7,14 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)  # Enable CORS for your Flask app
 
+# Use environment variable for Excel file path
+EXCEL_FILE_PATH = os.getenv('EXCEL_FILE_PATH', '/app/data.xlsx')
+print(f"Using Excel file path: {EXCEL_FILE_PATH}")
+
 # Load the existing Excel file or create a new one
 def load_excel():
     try:
-        df = pd.read_excel('data.xlsx')
+        df = pd.read_excel(EXCEL_FILE_PATH)
         # Reorder columns if they exist
         df = df[['VehicleNumber', 'ScannedCode', 'Timestamp']]
         return df
@@ -18,7 +23,9 @@ def load_excel():
 
 # Save the DataFrame back to the Excel file
 def save_excel(df):
-    df.to_excel('data.xlsx', index=False)
+    print(f"Saving to {EXCEL_FILE_PATH}")
+    df.to_excel(EXCEL_FILE_PATH, index=False)
+    print("Save complete")
 
 @app.route('/')
 def home():
@@ -26,7 +33,9 @@ def home():
 
 @app.route('/submit', methods=['POST'])
 def submit_data():
+    print("Received submit request")
     data = request.get_json()
+    print(f"Received data: {data}")
     vehicle_number = data.get('vehicleNumber')
     scanned_codes = data.get('codes')
 
@@ -49,7 +58,5 @@ def submit_data():
 
     return jsonify({'message': 'Data saved successfully!'}), 200
 
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-

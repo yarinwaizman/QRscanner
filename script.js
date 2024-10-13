@@ -21,3 +21,26 @@ Quagga.onDetected(function(result) {
         console.error('Error:', error);
     });
 });
+
+function startCamera(index) {
+    videoElements[index].style.display = 'block';
+    startCameraButtons[index].style.display = 'none';
+    codeReader
+        .listVideoInputDevices()
+        .then(videoInputDevices => {
+            const firstDeviceId = videoInputDevices[0].deviceId;
+            codeReader.decodeFromVideoDevice(firstDeviceId, videoElements[index].id, (result, err) => {
+                if (result) {
+                    scannedResultElements[index].textContent = result.text;
+                    scannedCodes[index] = result.text;
+                    videoElements[index].style.display = 'none'; // Hide camera after scanning
+                    console.log(`Scanned result ${index + 1}:`, result.text);
+                }
+                if (err && !(err instanceof ZXing.NotFoundException)) {
+                    console.error(err);
+                }
+            });
+        })
+        .catch(err => console.error(err));
+}
+

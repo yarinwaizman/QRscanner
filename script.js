@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.className = 'scanner-container';
         container.innerHTML = `
             <div id="output-${index}" class="output">No code scanned</div>
-            <div class="camera-icon" id="start-camera-${index}">&#x1F4F7;</div>
+            <div class="camera-icon" id="start-camera-${index}">&#x1F4F7; Scan</div>
             <div id="qr-reader-${index}" class="video-container"></div>
         `;
         scannersContainer.appendChild(container);

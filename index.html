@@ -37,19 +37,26 @@
         }
         .scanner-container {
             display: flex;
-            align-items: center;
             justify-content: center;
-            margin-bottom: 10px;
-            width: 80%;
-            margin-left: auto;
-            margin-right: auto;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .output {
+            width: 300px;
+            height: 40px;
+            padding: 10px;
+            margin-right: 10px;
+            text-align: center;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #fff;
+            font-size: 16px;
+            line-height: 40px;
         }
         .camera-icon {
-            font-size: 16px;
+            font-size: 24px;
             cursor: pointer;
-            margin-right: 10px;
-            display: inline-block;
-            padding: 5px 10px;
+            padding: 10px;
             background-color: #3498db;
             color: white;
             border-radius: 5px;
@@ -58,23 +65,11 @@
         .camera-icon:hover {
             background-color: #2980b9;
         }
-        .output {
-            flex: 1;
-            margin: 0;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #fff;
-            font-size: 14px;
-            text-align: left;
-            max-width: 300px;
-        }
         .video-container {
             display: none;
             width: 100%;
-            max-width: 200px;
-            height: auto;
-            margin-bottom: 20px;
+            max-width: 500px;
+            margin: 10px auto;
             border: 2px solid #333;
             border-radius: 10px;
         }
@@ -104,12 +99,16 @@
     <h1>Scan QR/Barcode</h1>
     <!-- Input for vehicle number styled as a license plate -->
     <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter vehicle number">
+    
     <div id="scanners">
-        <!-- Scanner containers will be generated here -->
+        <!-- Rows of scanned code boxes and camera icons will be generated here -->
     </div>
+
     <button id="submit" disabled>Submit</button>
+
     <!-- Footer message -->
     <footer>This website was developed by Yarin Waizman</footer>
+
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <script src="scanner.js"></script>
 </body>

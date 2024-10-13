@@ -8,9 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to handle successful scan
     function onScanSuccess(decodedText, index) {
         console.log(`Code matched = ${decodedText}`);
-        document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
+        document.getElementById(`output-${index}`).innerText = decodedText;
         scannedCodes[index] = decodedText;
-        submitButton.disabled = false;
+        if (scannedCodes.some(code => code)) {
+            submitButton.disabled = false;
+        }
     }
 
     // Function to handle scanning error
@@ -18,14 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`Error scanning QR Code: ${errorMessage}`);
     }
 
-    // Function to create a scanner
+    // Function to create a scanner row
     function createScanner(index) {
         const container = document.createElement('div');
         container.className = 'scanner-container';
         container.innerHTML = `
-            <div class="camera-icon" id="start-camera-${index}">&#x1F4F7; Scan</div>
-            <div id="qr-reader-${index}" style="width:500px; display:none;"></div>
-            <div id="qr-reader-results-${index}" class="output"></div>
+            <div id="output-${index}" class="output">No code scanned</div>
+            <div class="camera-icon" id="start-camera-${index}">&#x1F4F7;</div>
+            <div id="qr-reader-${index}" class="video-container"></div>
         `;
         scannersContainer.appendChild(container);
 
@@ -38,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         startCameraButton.addEventListener('click', () => {
-            console.log(`Starting camera ${index}...`);
+            console.log(`Starting camera for scanner ${index}...`);
             qrReader.style.display = 'block';
             html5QrCode.start(
                 { facingMode: "environment" },
@@ -46,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 (decodedText) => onScanSuccess(decodedText, index),
                 onScanError
             ).then(() => {
-                console.log(`Camera ${index} started`);
+                console.log(`Camera for scanner ${index} started`);
             }).catch(err => {
                 console.error(`Unable to start QR code scanner ${index}: ${err}`);
             });

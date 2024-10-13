@@ -153,9 +153,11 @@
                     inputStream: {
                         name: "Live",
                         type: "LiveStream",
-                        target: qrReader,
+                        target: qrReader, // Reference to the video element
                         constraints: {
-                            facingMode: "environment"
+                            facingMode: "environment", // Use the back camera
+                            width: { ideal: 1280 }, // Adjust as necessary
+                            height: { ideal: 720 } // Adjust as necessary
                         }
                     },
                     decoder: {
@@ -173,6 +175,7 @@
                         return;
                     }
                     console.log(`Quagga initialized for scanner ${index}`);
+                    qrReader.style.display = 'block'; // Make video element visible
                     Quagga.start();
                     Quagga.onDetected((data) => {
                         onScanSuccess(data.codeResult.code, index);

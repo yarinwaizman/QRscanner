@@ -149,42 +149,41 @@
             function createScanner(index) {
                 const qrReader = document.getElementById(`qr-reader-${index}`);
                 
-                Quagga.init({
-                    inputStream: {
-                        name: "Live",
-                        type: "LiveStream",
-                        target: qrReader, // Reference to the video element
-                        constraints: {
-                            facingMode: "environment", // Use the back camera
-                            width: { ideal: 1280 }, // Adjust as necessary
-                            height: { ideal: 720 } // Adjust as necessary
-                        }
-                    },
-                    decoder: {
-                        readers: [
-                            "code_128_reader",
-                            "ean_reader",
-                            "ean_8_reader",
-                            "code_39_reader",
-                            "upc_reader"
-                        ]
-                    }
-                }, (err) => {
-                    if (err) {
-                        console.error('Could not initialize Quagga:', err);
-                        return;
-                    }
-                    console.log(`Quagga initialized for scanner ${index}`);
-                    qrReader.style.display = 'block'; // Make video element visible
-                    Quagga.start();
-                    Quagga.onDetected((data) => {
-                        onScanSuccess(data.codeResult.code, index);
-                    });
-                });
-
+                // Add event listener to the "Scan" button to start scanning
                 document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
-                    qrReader.style.display = 'block'; // Show video element
-                    createScanner(index); // Start scanning when button is clicked
+                    // Initialize the scanner when the button is clicked
+                    Quagga.init({
+                        inputStream: {
+                            name: "Live",
+                            type: "LiveStream",
+                            target: qrReader, // Reference to the video element
+                            constraints: {
+                                facingMode: "environment", // Use the back camera
+                                width: { ideal: 1280 }, // Adjust as necessary
+                                height: { ideal: 720 } // Adjust as necessary
+                            }
+                        },
+                        decoder: {
+                            readers: [
+                                "code_128_reader",
+                                "ean_reader",
+                                "ean_8_reader",
+                                "code_39_reader",
+                                "upc_reader"
+                            ]
+                        }
+                    }, (err) => {
+                        if (err) {
+                            console.error('Could not initialize Quagga:', err);
+                            return;
+                        }
+                        console.log(`Quagga initialized for scanner ${index}`);
+                        qrReader.style.display = 'block'; // Make video element visible
+                        Quagga.start(); // Start the scanner
+                        Quagga.onDetected((data) => {
+                            onScanSuccess(data.codeResult.code, index);
+                        });
+                    });
                 });
             }
 

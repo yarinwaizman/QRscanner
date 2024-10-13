@@ -27,7 +27,7 @@ function startCamera(index) {
     startCameraButtons[index].style.display = 'none';
     const constraints = {
         video: {
-            facingMode: { exact: 'environment' } // Prefer rear camera
+            facingMode: { ideal: 'environment' } // Prefer rear camera
         }
     };
     navigator.mediaDevices.getUserMedia(constraints)
@@ -46,6 +46,7 @@ function startCamera(index) {
                 .catch(err => console.error('Error accessing camera:', err));
         });
 }
+
 
 
 

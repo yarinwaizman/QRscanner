@@ -20,20 +20,20 @@
         .license-plate {
             display: block;
             margin-bottom: 20px;
-            width: 260px;  
-            height: 80px;  
+            width: 260px;  /* Israeli license plate width */
+            height: 80px;  /* Israeli license plate height */
             font-size: 36px;
             text-align: center;
-            background-color: #FFD700; 
+            background-color: #FFD700; /* Yellow background */
             border: 2px solid #333;
             border-radius: 5px;
-            color: #000; 
-            letter-spacing: 5px; 
+            color: #000; /* Black text */
+            letter-spacing: 5px; /* Adds spacing between characters */
             margin-left: auto;
             margin-right: auto;
             padding: 10px 0;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            font-family: 'Arial', sans-serif;  
+            font-family: 'Arial', sans-serif;  /* Simple sans-serif font */
         }
         .scanner-container {
             display: flex;
@@ -136,80 +136,104 @@
     <button id="submit" disabled>Submit</button>
     <footer>This website was developed by Yarin Waizman</footer>
     <script>
-        let scannedCodes = Array(6).fill('');
-        let vehicleNumber = '';
-
-        function validateVehicleNumber() {
-            if (vehicleNumber.length === 7) {
-                var src = /^(\d{2})(\d{3})(\d{2})$/;
-            } else if (vehicleNumber.length === 8) {
-                var src = /^(\d{3})(\d{2})(\d{3})$/;
-            } else {
-                alert('Invalid Vehicle Number!');
-                return false;
-            }
-            var dst = '$1-$2-$3';
-            vehicleNumber = vehicleNumber.replace(src, dst);
-            return confirm(`Confirm the Vehicle Number:\r\n${vehicleNumber}`);
-        }
-
-        function onScanSuccess(decodedText, index) {
-            document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
-            scannedCodes[index] = decodedText;
-            document.getElementById('submit').disabled = false;
-            document.getElementById(`qr-reader-${index}`).style.display = 'none';
-        }
-
-        function createScanner(index) {
-            const qrReader = document.getElementById(`qr-reader-${index}`);
-            document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
-                qrReader.style.display = 'block'; 
-                const codeReader = new ZXing.BrowserQRCodeReader();
-                codeReader.getVideoInputDevices().then((videoInputDevices) => {
-                    const rearCamera = videoInputDevices.find(device => device.label.toLowerCase().includes('back')) || 
-                                       videoInputDevices.find(device => device.label.toLowerCase().includes('environment')) || 
-                                       videoInputDevices[0];
-
-                    codeReader.decodeFromVideoDevice(rearCamera.deviceId, qrReader, (result, err) => {
-                        if (result) {
-                            onScanSuccess(result.text, index);
-                            codeReader.reset();
-                        }
-                        if (err && !(err instanceof ZXing.NotFoundException)) {
-                            document.getElementById(`qr-reader-results-${index}`).textContent = `Error: ${err}`;
-                        }
-                    });
-                }).catch(err => {
-                    console.error(err);
-                    document.getElementById(`qr-reader-results-${index}`).textContent = `Error: ${err}`;
-                });
-            });
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
+            const submitButton = document.getElementById('submit');
+            const vehicleNumberInput = document.getElementById('vehicle-number');
+            let scannedCodes = Array(6).fill('');
+
+            function vehicleNumConfirm(e) {
+                var str = e.value;
+                if (str.length == 7) {
+                    var src = /^(\d{2})(\d{3})(\d{2})$/;
+                } else if (str.length == 8) {
+                    var src = /^(\d{3})(\d{2})(\d{3})$/;
+                } else {
+                    e.value = '';
+                    return false;
+                }
+                var dst = '$1-$2-$3';
+                str = str.replace(src, dst);
+                if (!confirm(`Confirm the Vehicle Number:\r\n${str}`)) {
+                    e.value = '';
+                    e.focus();
+                }
+            }
+
+            function onScanSuccess(decodedText, index) {
+                console.log(`QR Code Scanned: ${decodedText}`);
+                document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
+                scannedCodes[index] = decodedText;
+                submitButton.disabled = false;
+
+                // Hide the video element after scanning
+                document.getElementById(`qr-reader-${index}`).style.display = 'none';
+            }
+
+            function createScanner(index) {
+                const qrReader = document.getElementById(`qr-reader-${index}`);
+                document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
+                    qrReader.style.display = 'block'; // Show the camera when the scan starts
+                    const codeReader = new ZXing.BrowserQRCodeReader();
+                    console.log('QR code reader initialized');
+
+                    codeReader.getVideoInputDevices()
+                        .then((videoInputDevices) => {
+                            console.log('Available video input devices:', videoInputDevices);
+                            
+                            const rearCamera = videoInputDevices.find(device => device.label.toLowerCase().includes('back')) || 
+                                                videoInputDevices.find(device => device.label.toLowerCase().includes('environment')) || 
+                                                videoInputDevices[0];
+
+                            console.log('Using camera:', rearCamera);
+                            
+                            codeReader.decodeFromVideoDevice(rearCamera.deviceId, qrReader, (result, err) => {
+                                if (result) {
+                                    console.log(result);
+                                    onScanSuccess(result.text, index);
+                                    codeReader.reset();
+                                }
+                                if (err && !(err instanceof ZXing.NotFoundException)) {
+                                    console.error(err);
+                                    document.getElementById(`qr-reader-results-${index}`).textContent = `Error: ${err}`;
+                                }
+                            }, {
+                                facingMode: { exact: "environment" }
+                            });
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                            document.getElementById(`qr-reader-results-${index}`).textContent = `Error: ${err}`;
+                        });
+                });
+            }
+
             for (let i = 0; i < 6; i++) {
                 createScanner(i);
             }
 
-            const vehicleNumberInput = document.getElementById('vehicle-number');
-            vehicleNumberInput.addEventListener('input', (e) => {
-                vehicleNumber = e.target.value;
-            });
-
-            document.getElementById('submit').addEventListener('click', () => {
-                if (scannedCodes.some(code => code) && validateVehicleNumber()) {
+            submitButton.addEventListener('click', () => {
+                const vehicleNumber = vehicleNumberInput.value;
+                if (scannedCodes.some(code => code) && vehicleNumber) {
+                    vehicleNumConfirm(vehicleNumberInput); // Confirm the vehicle number
                     console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
                     fetch('https://qrscanner-6dow.onrender.com/submit', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber }),
                     })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.json();
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        alert('Data submitted successfully!');
                     })
-                    .then(data => console.log(data))
-                    .catch(error => console.error('Error:', error));
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        alert('Error submitting data. Please try again.');
+                    });
+                } else {
+                    alert('Please scan at least one code and enter the vehicle number.');
                 }
             });
         });

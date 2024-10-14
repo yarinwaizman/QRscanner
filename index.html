@@ -100,54 +100,57 @@
 </head>
 <body>
     <h1>Scan QR/Barcode</h1>
-    <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter L.P" oninput="vehicleNumConfirm(this)">
+    <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter L.P">
     <div id="scanners">
         <div class="scanner-container">
             <div class="camera-icon" id="start-camera-0">&#x1F4F7; Scan</div>
             <video id="qr-reader-0" style="display: none;"></video>
             <div class="output" id="qr-reader-results-0">No code scanned yet</div>
         </div>
-        <!-- Add more scanners here if needed -->
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-1">&#x1F4F7; Scan</div>
+            <video id="qr-reader-1" style="display: none;"></video>
+            <div class="output" id="qr-reader-results-1">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-2">&#x1F4F7; Scan</div>
+            <video id="qr-reader-2" style="display: none;"></video>
+            <div class="output" id="qr-reader-results-2">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-3">&#x1F4F7; Scan</div>
+            <video id="qr-reader-3" style="display: none;"></video>
+            <div class="output" id="qr-reader-results-3">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-4">&#x1F4F7; Scan</div>
+            <video id="qr-reader-4" style="display: none;"></video>
+            <div class="output" id="qr-reader-results-4">No code scanned yet</div>
+        </div>
+        <div class="scanner-container">
+            <div class="camera-icon" id="start-camera-5">&#x1F4F7; Scan</div>
+            <video id="qr-reader-5" style="display: none;"></video>
+            <div class="output" id="qr-reader-results-5">No code scanned yet</div>
+        </div>
     </div>
     <button id="submit" disabled>Submit</button>
     <footer>This website was developed by Yarin Waizman</footer>
     <script>
         let scannedCodes = Array(6).fill('');
-        let torchmode = false;
+        let vehicleNumber = '';
 
-        function vehicleNumConfirm(e) {
-            var str = e.value;
-            if (str.length == 7) {
+        function validateVehicleNumber() {
+            if (vehicleNumber.length === 7) {
                 var src = /^(\d{2})(\d{3})(\d{2})$/;
-            } else if (str.length == 8) {
+            } else if (vehicleNumber.length === 8) {
                 var src = /^(\d{3})(\d{2})(\d{3})$/;
             } else {
                 alert('Invalid Vehicle Number!');
-                e.value = '';
                 return false;
             }
             var dst = '$1-$2-$3';
-            str = str.replace(src, dst);
-            if (!confirm(`Confirm the Vehicle Number:\r\n${str}`)) {
-                e.value = '';
-                e.focus();
-            }
-        }
-
-        function torch() {
-            torchmode = !torchmode;
-            const videoTrack = document.querySelector('video').srcObject.getVideoTracks()[0];
-            const capabilities = videoTrack.getCapabilities();
-
-            if (capabilities.torch) {
-                const constraints = {
-                    advanced: [{ torch: torchmode }]
-                };
-                videoTrack.applyConstraints(constraints)
-                    .catch(err => console.error("Torch not supported", err));
-            } else {
-                alert("Torch not supported on this device.");
-            }
+            vehicleNumber = vehicleNumber.replace(src, dst);
+            return confirm(`Confirm the Vehicle Number:\r\n${vehicleNumber}`);
         }
 
         function onScanSuccess(decodedText, index) {
@@ -188,23 +191,25 @@
                 createScanner(i);
             }
 
+            const vehicleNumberInput = document.getElementById('vehicle-number');
+            vehicleNumberInput.addEventListener('input', (e) => {
+                vehicleNumber = e.target.value;
+            });
+
             document.getElementById('submit').addEventListener('click', () => {
-                const vehicleNumber = document.getElementById('vehicle-number').value;
-                if (scannedCodes.some(code => code) && vehicleNumber) {
+                if (scannedCodes.some(code => code) && validateVehicleNumber()) {
                     console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
                     fetch('https://qrscanner-6dow.onrender.com/submit', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert("Data saved successfully!");
-                        location.reload();
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
                     })
+                    .then(data => console.log(data))
                     .catch(error => console.error('Error:', error));
-                } else {
-                    alert("No scanned codes or vehicle number to submit.");
                 }
             });
         });

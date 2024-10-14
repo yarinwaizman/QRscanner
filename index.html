@@ -18,22 +18,22 @@
             margin-bottom: 20px;
         }
         .license-plate {
-        display: block;
-        margin-bottom: 20px;
-        width: 260px;  /* Israeli license plate width */
-        height: 80px;  /* Israeli license plate height */
-        font-size: 36px;
-        text-align: center;
-        background-color: #FFD700; /* Yellow background */
-        border: 2px solid #333;
-        border-radius: 5px;
-        color: #000; /* Black text */
-        letter-spacing: 5px; /* Adds spacing between characters */
-        margin-left: auto;
-        margin-right: auto;
-        padding: 10px 0;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        font-family: 'Arial', sans-serif;  /* Simple sans-serif font */
+            display: block;
+            margin-bottom: 20px;
+            width: 260px;  
+            height: 80px;  
+            font-size: 36px;
+            text-align: center;
+            background-color: #FFD700; 
+            border: 2px solid #333;
+            border-radius: 5px;
+            color: #000; 
+            letter-spacing: 5px; 
+            margin-left: auto;
+            margin-right: auto;
+            padding: 10px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            font-family: 'Arial', sans-serif;  
         }
         .scanner-container {
             display: flex;
@@ -100,101 +100,96 @@
 </head>
 <body>
     <h1>Scan QR/Barcode</h1>
-    <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter L.P">
+    <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter L.P" oninput="vehicleNumConfirm(this)">
     <div id="scanners">
         <div class="scanner-container">
             <div class="camera-icon" id="start-camera-0">&#x1F4F7; Scan</div>
             <video id="qr-reader-0" style="display: none;"></video>
             <div class="output" id="qr-reader-results-0">No code scanned yet</div>
         </div>
-        <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-1">&#x1F4F7; Scan</div>
-            <video id="qr-reader-1" style="display: none;"></video>
-            <div class="output" id="qr-reader-results-1">No code scanned yet</div>
-        </div>
-        <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-2">&#x1F4F7; Scan</div>
-            <video id="qr-reader-2" style="display: none;"></video>
-            <div class="output" id="qr-reader-results-2">No code scanned yet</div>
-        </div>
-        <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-3">&#x1F4F7; Scan</div>
-            <video id="qr-reader-3" style="display: none;"></video>
-            <div class="output" id="qr-reader-results-3">No code scanned yet</div>
-        </div>
-        <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-4">&#x1F4F7; Scan</div>
-            <video id="qr-reader-4" style="display: none;"></video>
-            <div class="output" id="qr-reader-results-4">No code scanned yet</div>
-        </div>
-        <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-5">&#x1F4F7; Scan</div>
-            <video id="qr-reader-5" style="display: none;"></video>
-            <div class="output" id="qr-reader-results-5">No code scanned yet</div>
-        </div>
+        <!-- Add more scanners here if needed -->
     </div>
     <button id="submit" disabled>Submit</button>
     <footer>This website was developed by Yarin Waizman</footer>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const submitButton = document.getElementById('submit');
-            const vehicleNumberInput = document.getElementById('vehicle-number');
-            let scannedCodes = Array(6).fill('');
+        let scannedCodes = Array(6).fill('');
+        let torchmode = false;
 
-            function onScanSuccess(decodedText, index) {
-                console.log(`QR Code Scanned: ${decodedText}`);
-                document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
-                scannedCodes[index] = decodedText;
-                submitButton.disabled = false;
-
-                // Hide the video element after scanning
-                document.getElementById(`qr-reader-${index}`).style.display = 'none';
+        function vehicleNumConfirm(e) {
+            var str = e.value;
+            if (str.length == 7) {
+                var src = /^(\d{2})(\d{3})(\d{2})$/;
+            } else if (str.length == 8) {
+                var src = /^(\d{3})(\d{2})(\d{3})$/;
+            } else {
+                alert('Invalid Vehicle Number!');
+                e.value = '';
+                return false;
             }
+            var dst = '$1-$2-$3';
+            str = str.replace(src, dst);
+            if (!confirm(`Confirm the Vehicle Number:\r\n${str}`)) {
+                e.value = '';
+                e.focus();
+            }
+        }
 
-            function createScanner(index) {
-                const qrReader = document.getElementById(`qr-reader-${index}`);
-                document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
-                    qrReader.style.display = 'block'; // Show the camera when the scan starts
-                    const codeReader = new ZXing.BrowserQRCodeReader();
-                    console.log('QR code reader initialized');
+        function torch() {
+            torchmode = !torchmode;
+            const videoTrack = document.querySelector('video').srcObject.getVideoTracks()[0];
+            const capabilities = videoTrack.getCapabilities();
 
-                    codeReader.getVideoInputDevices()
-                        .then((videoInputDevices) => {
-                            console.log('Available video input devices:', videoInputDevices);
-                            
-                            const rearCamera = videoInputDevices.find(device => device.label.toLowerCase().includes('back')) || 
-                                                videoInputDevices.find(device => device.label.toLowerCase().includes('environment')) || 
-                                                videoInputDevices[0];
+            if (capabilities.torch) {
+                const constraints = {
+                    advanced: [{ torch: torchmode }]
+                };
+                videoTrack.applyConstraints(constraints)
+                    .catch(err => console.error("Torch not supported", err));
+            } else {
+                alert("Torch not supported on this device.");
+            }
+        }
 
-                            console.log('Using camera:', rearCamera);
-                            
-                            codeReader.decodeFromVideoDevice(rearCamera.deviceId, qrReader, (result, err) => {
-                                if (result) {
-                                    console.log(result);
-                                    onScanSuccess(result.text, index);
-                                    codeReader.reset();
-                                }
-                                if (err && !(err instanceof ZXing.NotFoundException)) {
-                                    console.error(err);
-                                    document.getElementById(`qr-reader-results-${index}`).textContent = `Error: ${err}`;
-                                }
-                            }, {
-                                facingMode: { exact: "environment" }
-                            });
-                        })
-                        .catch((err) => {
-                            console.error(err);
+        function onScanSuccess(decodedText, index) {
+            document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
+            scannedCodes[index] = decodedText;
+            document.getElementById('submit').disabled = false;
+            document.getElementById(`qr-reader-${index}`).style.display = 'none';
+        }
+
+        function createScanner(index) {
+            const qrReader = document.getElementById(`qr-reader-${index}`);
+            document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
+                qrReader.style.display = 'block'; 
+                const codeReader = new ZXing.BrowserQRCodeReader();
+                codeReader.getVideoInputDevices().then((videoInputDevices) => {
+                    const rearCamera = videoInputDevices.find(device => device.label.toLowerCase().includes('back')) || 
+                                       videoInputDevices.find(device => device.label.toLowerCase().includes('environment')) || 
+                                       videoInputDevices[0];
+
+                    codeReader.decodeFromVideoDevice(rearCamera.deviceId, qrReader, (result, err) => {
+                        if (result) {
+                            onScanSuccess(result.text, index);
+                            codeReader.reset();
+                        }
+                        if (err && !(err instanceof ZXing.NotFoundException)) {
                             document.getElementById(`qr-reader-results-${index}`).textContent = `Error: ${err}`;
-                        });
+                        }
+                    });
+                }).catch(err => {
+                    console.error(err);
+                    document.getElementById(`qr-reader-results-${index}`).textContent = `Error: ${err}`;
                 });
-            }
+            });
+        }
 
+        document.addEventListener('DOMContentLoaded', () => {
             for (let i = 0; i < 6; i++) {
                 createScanner(i);
             }
 
-            submitButton.addEventListener('click', () => {
-                const vehicleNumber = vehicleNumberInput.value;
+            document.getElementById('submit').addEventListener('click', () => {
+                const vehicleNumber = document.getElementById('vehicle-number').value;
                 if (scannedCodes.some(code => code) && vehicleNumber) {
                     console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
                     fetch('https://qrscanner-6dow.onrender.com/submit', {
@@ -204,17 +199,14 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Success:', data);
                         alert("Data saved successfully!");
                         location.reload();
                     })
                     .catch(error => console.error('Error:', error));
                 } else {
-                    console.log("No scanned codes or vehicle number to submit.");
+                    alert("No scanned codes or vehicle number to submit.");
                 }
             });
-            
-            console.log('DOM fully loaded and parsed');
         });
     </script>
 </body>

@@ -218,17 +218,24 @@
                     console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
                     fetch('https://qrscanner-6dow.onrender.com/submit', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber }),
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
                     })
                     .then(response => response.json())
                     .then(data => {
                         console.log('Success:', data);
                         alert('Data submitted successfully!');
+
+                        // Clear the inputs and outputs for new scans
+                        scannedCodes = Array(6).fill('');
+                        vehicleNumberInput.value = '';
+                        for (let i = 0; i < 6; i++) {
+                            document.getElementById(`qr-reader-results-${i}`).innerText = 'No code scanned yet';
+                            document.getElementById(`qr-reader-${i}`).style.display = 'none';
+                        }
+                        submitButton.disabled = true; // Disable submit button again
                     })
-                    .catch((error) => {
+                    .catch(error => {
                         console.error('Error:', error);
                         alert('Error submitting data. Please try again.');
                     });
@@ -236,6 +243,8 @@
                     alert('Please scan at least one code and enter the vehicle number.');
                 }
             });
+            
+            console.log('DOM fully loaded and parsed');
         });
     </script>
 </body>

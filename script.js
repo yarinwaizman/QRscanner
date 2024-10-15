@@ -8,24 +8,28 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(`qr-reader-results-${index}`).innerText = `Scanned Code: ${decodedText}`;
         scannedCodes[index] = decodedText;
         submitButton.disabled = false;
+
+        // Hide the video element after scanning
         document.getElementById(`qr-reader-${index}`).style.display = 'none';
     }
 
     function createScanner(index) {
         const qrReader = document.getElementById(`qr-reader-${index}`);
         document.getElementById(`start-camera-${index}`).addEventListener('click', () => {
-            qrReader.style.display = 'block'; 
+            qrReader.style.display = 'block'; // Show the camera when the scan starts
             const codeReader = new ZXing.BrowserQRCodeReader();
             console.log('QR code reader initialized');
 
             codeReader.getVideoInputDevices()
                 .then((videoInputDevices) => {
+                    console.log('Available video input devices:', videoInputDevices);
+                    
                     const rearCamera = videoInputDevices.find(device => device.label.toLowerCase().includes('back')) || 
                                         videoInputDevices.find(device => device.label.toLowerCase().includes('environment')) || 
                                         videoInputDevices[0];
-                    
-                    console.log('Using camera:', rearCamera);
 
+                    console.log('Using camera:', rearCamera);
+                    
                     codeReader.decodeFromVideoDevice(rearCamera.deviceId, qrReader, (result, err) => {
                         if (result) {
                             console.log(result);
@@ -55,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const vehicleNumber = vehicleNumberInput.value;
         if (scannedCodes.some(code => code) && vehicleNumber) {
             console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
-            fetch('https://qrscanner-6dow.onrender.com/submit', {
+            fetch('https://qrscanner-6dow.onrender.com/save_scans.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })
@@ -64,11 +68,13 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => {
                 console.log('Success:', data);
                 alert("Data saved successfully!");
-                location.reload();
+                location.reload(); // Reload the page after submission
             })
             .catch(error => console.error('Error:', error));
         } else {
             console.log("No scanned codes or vehicle number to submit.");
         }
     });
+    
+    console.log('DOM fully loaded and parsed');
 });

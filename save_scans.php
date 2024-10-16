@@ -7,13 +7,15 @@ header('Access-Control-Allow-Headers: Content-Type');
 // Handle preflight request (OPTIONS)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
     exit;
 }
 
 // Database connection parameters
-$servername = "localhost"; // e.g., "localhost" or your server's IP
-$username = "root";
-$password = "Yy@201096207174160!Waizman?";
+$servername = "localhost"; // Use your Render DB host here for cloud DB
+$username = "root"; // Update accordingly
+$password = "Yy@201096207174160!Waizman?"; // Update accordingly
 $dbname = "qr_scanner_db";
 
 // Create connection
@@ -26,7 +28,7 @@ if ($conn->connect_error) {
     exit;
 }
 
-// Your existing code to handle the POST request
+// Handle the POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
     $vehicleNumber = $data['vehicleNumber'] ?? '';
@@ -41,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Prepare SQL statement to insert data
     $stmt = $conn->prepare("INSERT INTO scans (vehicle_number, scanned_code) VALUES (?, ?)");
-    
     if (!$stmt) {
         http_response_code(500);
         echo json_encode(['status' => 'error', 'message' => 'SQL statement preparation failed: ' . $conn->error]);
@@ -61,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Close statement and connection
     $stmt->close();
     $conn->close();
-
     http_response_code(200);
     echo json_encode(['status' => 'success', 'message' => 'Data saved successfully!']);
 }

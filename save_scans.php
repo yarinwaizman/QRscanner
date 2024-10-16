@@ -1,68 +1,68 @@
 <?php
-// CORS headers to allow requests from your frontend
-header('Access-Control-Allow-Origin: https://yarinwaizman.github.io'); // Replace with your frontend URL
+// Allow access from your frontend
+header('Access-Control-Allow-Origin: https://yarinwaizman.github.io');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// Handle preflight request
+// Handle preflight request (OPTIONS)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Connect to MySQL database
-    $servername = "localhost";  // Use your actual database host
+// Database connection parameters
+$servername = "localhost"; // e.g., "localhost" or your server's IP
 $username = "root";
 $password = "Yy@201096207174160!Waizman?";
 $dbname = "qr_scanner_db";
 
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $dbname);
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-    // Check connection
-    if ($conn->connect_error) {
-        die(json_encode(['status' => 'error', 'message' => 'Connection failed: ' . $conn->connect_error]));
-    }
+// Check connection
+if ($conn->connect_error) {
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'Database connection failed: ' . $conn->connect_error]);
+    exit;
+}
 
-    // Get the JSON input
-    $data = json_decode(file_get_contents("php://input"), true);
+// Your existing code to handle the POST request
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $vehicleNumber = $data['vehicleNumber'] ?? '';
+    $codes = $data['codes'] ?? [];
 
-    // Extract the vehicle number and scanned codes
-    $vehicle_number = $data['vehicleNumber'];
-    $scanned_codes = $data['codes'];
-
-    // Check for missing inputs
-    if (!$vehicle_number || empty($scanned_codes) || !is_array($scanned_codes)) {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid input']);
+    // Validate input
+    if (empty($vehicleNumber) || empty($codes)) {
         http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Invalid input']);
         exit;
     }
 
-    // Insert each scanned code into the database
-    $stmt = $conn->prepare("INSERT INTO scans (vehicle_number, scanned_code, created_at) VALUES (?, ?, NOW())");
+    // Prepare SQL statement to insert data
+    $stmt = $conn->prepare("INSERT INTO scans (vehicle_number, scanned_code) VALUES (?, ?)");
     
-    foreach ($scanned_codes as $code) {
-        if (!empty($code)) {
-            $stmt->bind_param("ss", $vehicle_number, $code);
-            $stmt->execute();
+    if (!$stmt) {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'SQL statement preparation failed: ' . $conn->error]);
+        exit;
+    }
+
+    // Bind parameters and execute for each scanned code
+    foreach ($codes as $code) {
+        $stmt->bind_param("ss", $vehicleNumber, $code);
+        if (!$stmt->execute()) {
+            http_response_code(500);
+            echo json_encode(['status' => 'error', 'message' => 'Execution failed: ' . $stmt->error]);
+            exit;
         }
     }
 
-    // Check if the insert was successful
-    if ($stmt->error) {
-        echo json_encode(['status' => 'error', 'message' => $stmt->error]);
-        http_response_code(500);
-    } else {
-        echo json_encode(['status' => 'success', 'message' => 'Data saved successfully']);
-        http_response_code(200);
-    }
-
-    // Close the statement and connection
+    // Close statement and connection
     $stmt->close();
     $conn->close();
-} else {
-    echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
-    http_response_code(405); // Method Not Allowed
+
+    http_response_code(200);
+    echo json_encode(['status' => 'success', 'message' => 'Data saved successfully!']);
 }
 ?>

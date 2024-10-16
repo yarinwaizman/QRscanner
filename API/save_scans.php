@@ -30,7 +30,7 @@ if (isset($data->vehicle_number) && isset($data->scanned_codes)) {
     $pass = 'Yy@201096207174160!Waizman?'; // Replace with your MySQL password
 
     // Create connection
-    $conn = new mysqli($servername, $username, $password, $dbname);
+    $conn = new mysqli($host, $user, $pass, $db);
 
     // Check connection
     if ($conn->connect_error) {

@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const vehicleNumber = vehicleNumberInput.value;
         if (scannedCodes.some(code => code) && vehicleNumber) {
             console.log("Submitting codes:", scannedCodes, "Vehicle number:", vehicleNumber);
-            fetch('https://qrscanner-6dow.onrender.com/API/save_scans.php', {
+            fetch('https://qrscanner-6dow.onrender.com/save_scans.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ codes: scannedCodes, vehicleNumber: vehicleNumber })

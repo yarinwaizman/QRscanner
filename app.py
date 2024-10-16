@@ -1,43 +1,28 @@
 import os
-from flask import Flask, request, jsonify, send_file
-import pandas as pd
+import mysql.connector
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
 
-# Use a writable directory for the Excel file path
-EXCEL_FILE_PATH = '/tmp/data.xlsx'
-print(f"Using Excel file path: {EXCEL_FILE_PATH}")
+# Database connection parameters
+DB_CONFIG = {
+    'user': 'root',  # replace with your MySQL username
+    'password': 'Yy@201096207174160!Waizman?',  # replace with your MySQL password
+    'host': 'localhost',  # or your DB host
+    'database': 'qr_scanner_db'  # replace with your database name
+}
 
-# Ensure the directory exists (only if writable)
-if not os.path.exists(os.path.dirname(EXCEL_FILE_PATH)):
+# Connect to the database
+def get_db_connection():
     try:
-        os.makedirs(os.path.dirname(EXCEL_FILE_PATH), exist_ok=True)
-        print(f"Directory created: {os.path.dirname(EXCEL_FILE_PATH)}")
-    except OSError as e:
-        print(f"Error creating directory: {e}")
-
-# Load the existing Excel file or create a new one
-def load_excel():
-    try:
-        print(f"Loading from {EXCEL_FILE_PATH}")
-        df = pd.read_excel(EXCEL_FILE_PATH)
-        df = df[['VehicleNumber', 'ScannedCode', 'Timestamp']]
-        return df
-    except FileNotFoundError:
-        print("Excel file not found. Creating a new one.")
-        return pd.DataFrame(columns=['VehicleNumber', 'ScannedCode', 'Timestamp'])
-
-# Save the DataFrame back to the Excel file
-def save_excel(df):
-    try:
-        print(f"Saving to {EXCEL_FILE_PATH}")
-        df.to_excel(EXCEL_FILE_PATH, index=False)
-        print("Save complete")
-    except Exception as e:
-        print(f"Error saving to {EXCEL_FILE_PATH}: {e}")
+        connection = mysql.connector.connect(**DB_CONFIG)
+        return connection
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        return None
 
 @app.route('/')
 def home():
@@ -58,27 +43,27 @@ def submit_data():
 
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        df = load_excel()
+        connection = get_db_connection()
+        if connection is None:
+            return jsonify({'error': 'Database connection failed'}), 500
 
-        new_rows = pd.DataFrame({
-            'VehicleNumber': [vehicle_number] * len(scanned_codes),
-            'ScannedCode': scanned_codes,
-            'Timestamp': [timestamp] * len(scanned_codes)
-        })
+        cursor = connection.cursor()
 
-        df = pd.concat([df, new_rows], ignore_index=True)
+        for code in scanned_codes:
+            cursor.execute(
+                "INSERT INTO scans (vehicle_number, scanned_code, created_at) VALUES (%s, %s, %s)",
+                (vehicle_number, code, timestamp)
+            )
 
-        save_excel(df)
+        connection.commit()
+        cursor.close()
+        connection.close()
 
         print("Data saved successfully")
         return jsonify({'message': 'Data saved successfully!'}), 200
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({'error': str(e)}), 500
-
-@app.route('/download', methods=['GET'])
-def download_file():
-    return send_file(EXCEL_FILE_PATH, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

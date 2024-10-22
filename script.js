@@ -78,3 +78,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('DOM fully loaded and parsed');
 });
+
+function updateLicensePlate(number) {
+  const cleanNumber = number.replace(/\D/g, ''); // Remove non-digits
+  if (cleanNumber.length !== 7 && cleanNumber.length !== 8) {
+    console.error('Invalid license plate number');
+    return;
+  }
+  
+  let formattedNumber;
+  if (cleanNumber.length === 7) {
+    // Format: 00-000-00
+    formattedNumber = `${cleanNumber.slice(0, 2)}-${cleanNumber.slice(2, 5)}-${cleanNumber.slice(5)}`;
+  } else {
+    // Format: 000-00-000
+    formattedNumber = `${cleanNumber.slice(0, 3)}-${cleanNumber.slice(3, 5)}-${cleanNumber.slice(5)}`;
+  }
+  
+  document.getElementById('licensePlateDisplay').textContent = formattedNumber;
+}
+
+// Example usage:
+// updateLicensePlate('1234567');  // Displays as 12-345-67
+// updateLicensePlate('12345678'); // Displays as 123-45-678

@@ -4,46 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR/Barcode Scanner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.18.6/umd/index.min.js"></script>
 </head>
 <body>
-    <h1>Scan QR/Barcode</h1>
-    <input type="text" id="vehicle-number" class="license-plate" placeholder="Enter L.P">
-    <div id="scanners">
-        <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-0">&#x1F4F7; </div>
-            <video id="qr-reader-0" style="display: none;"></video>
-            <div class="output" id="qr-reader-results-0">No code scanned yet</div>
+    <div class="container">
+        <h1>Scan QR/Barcode</h1>
+        <div class="license-plate">
+            <div class="plate-content" id="licensePlateDisplay">
+                00-000-00
+            </div>
         </div>
-        <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-1">&#x1F4F7; </div>
-            <video id="qr-reader-1" style="display: none;"></video>
-            <div class="output" id="qr-reader-results-1">No code scanned yet</div>
+        <div id="scanners">
+            <div class="scanner-container">
+                <div class="camera-icon" id="start-camera-0">&#x1F4F7; </div>
+                <video id="qr-reader-0" style="display: none;"></video>
+                <div class="output" id="qr-reader-results-0">No code scanned yet</div>
+            </div>
+            <div class="scanner-container">
+                <div class="camera-icon" id="start-camera-1">&#x1F4F7; </div>
+                <video id="qr-reader-1" style="display: none;"></video>
+                <div class="output" id="qr-reader-results-1">No code scanned yet</div>
+            </div>
+            <div class="scanner-container">
+                <div class="camera-icon" id="start-camera-2">&#x1F4F7; </div>
+                <video id="qr-reader-2" style="display: none;"></video>
+                <div class="output" id="qr-reader-results-2">No code scanned yet</div>
+            </div>
+            <div class="scanner-container">
+                <div class="camera-icon" id="start-camera-3">&#x1F4F7; </div>
+                <video id="qr-reader-3" style="display: none;"></video>
+                <div class="output" id="qr-reader-results-3">No code scanned yet</div>
+            </div>
+            <div class="scanner-container">
+                <div class="camera-icon" id="start-camera-4">&#x1F4F7; </div>
+                <video id="qr-reader-4" style="display: none;"></video>
+                <div class="output" id="qr-reader-results-4">No code scanned yet</div>
+            </div>
+            <div class="scanner-container">
+                <div class="camera-icon" id="start-camera-5">&#x1F4F7; </div>
+                <video id="qr-reader-5" style="display: none;"></video>
+                <div class="output" id="qr-reader-results-5">No code scanned yet</div>
+            </div>
         </div>
-        <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-2">&#x1F4F7; </div>
-            <video id="qr-reader-2" style="display: none;"></video>
-            <div class="output" id="qr-reader-results-2">No code scanned yet</div>
-        </div>
-        <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-3">&#x1F4F7; </div>
-            <video id="qr-reader-3" style="display: none;"></video>
-            <div class="output" id="qr-reader-results-3">No code scanned yet</div>
-        </div>
-        <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-4">&#x1F4F7; </div>
-            <video id="qr-reader-4" style="display: none;"></video>
-            <div class="output" id="qr-reader-results-4">No code scanned yet</div>
-        </div>
-        <div class="scanner-container">
-            <div class="camera-icon" id="start-camera-5">&#x1F4F7; </div>
-            <video id="qr-reader-5" style="display: none;"></video>
-            <div class="output" id="qr-reader-results-5">No code scanned yet</div>
-        </div>
+        <button id="submit" disabled>Submit</button>
+        <footer>This website was developed by Yarin Waizman</footer>
+        <script src="script.js"></script>
     </div>
-    <button id="submit" disabled>Submit</button>
-    <footer>This website was developed by Yarin Waizman</footer>
-    <script src="script.js"></script>
 </body>
 </html>
